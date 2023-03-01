@@ -52,7 +52,7 @@ SPI_HandleTypeDef hspi1;
 /* USER CODE BEGIN PV */
 
 wiz_NetInfo gWIZNETINFO = { .mac = {0x00, 0x08, 0xdc, 0xab, 0xcd, 0xef},
-                            .ip = {192, 168, 88, 207},
+                            .ip = {192, 168, 3, 207},
                             .sn = {255, 255, 255, 0},
                             .gw = {192, 168, 88, 1},
                             .dns = {0, 0, 0, 0},
@@ -70,12 +70,12 @@ void W5500_Unselect(void)
 
 void W5500_ReadBuff(uint8_t* buff, uint16_t len)
 {
-    HAL_SPI_Receive(&hspi1, buff, len, HAL_MAX_DELAY);
+	HAL_StatusTypeDef value = HAL_SPI_Receive(&hspi1, buff, len, HAL_MAX_DELAY);
 }
 
 void W5500_WriteBuff(uint8_t* buff, uint16_t len)
 {
-    HAL_SPI_Transmit(&hspi1, buff, len, HAL_MAX_DELAY);
+	HAL_StatusTypeDef value = HAL_SPI_Transmit(&hspi1, buff, len, HAL_MAX_DELAY);
 }
 
 uint8_t W5500_ReadByte(void)
