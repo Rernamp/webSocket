@@ -10,7 +10,8 @@ Application& Application::getInstante() {
 	return app;
 }
 
-Application::Application() {
+extern SPI_HandleTypeDef hspi1;
+Application::Application() : _w5500Spi(hspi1, _cs) {
 	Eni::Gpio::initOutput(_led);
 }
 
@@ -19,7 +20,6 @@ Application::Application() {
 #define PORT_TCPS		    5000
 #define DATA_BUF_SIZE   2048
 uint8_t gDATABUF[DATA_BUF_SIZE];
-extern SPI_HandleTypeDef hspi1;
 
 
 wiz_NetInfo gWIZNETINFO = { .mac = {0x00, 0x08, 0xdc, 0xab, 0xcd, 0xef},
@@ -29,41 +29,42 @@ wiz_NetInfo gWIZNETINFO = { .mac = {0x00, 0x08, 0xdc, 0xab, 0xcd, 0xef},
                             .dns = {0, 0, 0, 0},
                             .dhcp = NETINFO_STATIC };
 
+uint8_t stat;
+uint8_t reqnr;
+char Message[128];
+
 void W5500_Select(void)
 {
-    HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_RESET);
+    Application::getInstante().getSpi().select();
 }
 
 void W5500_Unselect(void)
 {
-    HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
+	Application::getInstante().getSpi().unselect();
 }
 
 void W5500_ReadBuff(uint8_t* buff, uint16_t len)
 {
-	auto value = HAL_SPI_Receive(&hspi1, buff, len, HAL_MAX_DELAY);
+	Application::getInstante().getSpi().readBuff(buff, len);
 }
 
 void W5500_WriteBuff(uint8_t* buff, uint16_t len)
 {
-	auto value = HAL_SPI_Transmit(&hspi1, buff, len, HAL_MAX_DELAY);
+	Application::getInstante().getSpi().writeBuff(buff, len);
 }
 
 uint8_t W5500_ReadByte(void)
 {
     uint8_t byte;
-    W5500_ReadBuff(&byte, sizeof(byte));
+    Application::getInstante().getSpi().readBuff(&byte, sizeof(byte));
     return byte;
 }
 
 void W5500_WriteByte(uint8_t byte)
 {
-    W5500_WriteBuff(&byte, sizeof(byte));
+	Application::getInstante().getSpi().writeBuff(&byte, sizeof(byte));
 }
 
-uint8_t stat;
-uint8_t reqnr;
-char Message[128];
 
 
 void Application::run() {
@@ -138,3 +139,4 @@ void Application::ledProcess() {
 	}
 
 }
+
