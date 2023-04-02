@@ -31,7 +31,6 @@ wiz_NetInfo gWIZNETINFO = { .mac = {0x00, 0x08, 0xdc, 0xab, 0xcd, 0xef},
 
 uint8_t stat;
 uint8_t reqnr;
-char Message[128];
 
 void W5500_Select(void)
 {
@@ -93,31 +92,30 @@ void Application::run() {
 	ctlnetwork(CN_SET_NETINFO, (void*) &gWIZNETINFO);
 	Threading::ThisThread::sleepForMs(1000);
 
+	std::array<uint8_t, 4> ip;
+	uint16_t port;
+
+
+	uint32_t size = buffer.size();
+
+	buffer.fill(10);
+
 	while(true) {
 		printf("Creating socket...\r\n");
-		stat = socket(HTTP_SOCKET, Sn_MR_TCP, 80, 0);
+		stat = socket(HTTP_SOCKET, Sn_MR_UDP, 80, 0);
 		if(stat != HTTP_SOCKET) printf("socket() failed, code = %d\r\n", stat);
 		else printf("Socket created, connecting...\r\n");
 
-		stat = listen(HTTP_SOCKET);
-		if(stat != SOCK_OK) printf("listen() failed, code = %d\r\n", stat);
-		else printf("listen() OK\r\n");
-
-		while(getSn_SR(HTTP_SOCKET) == SOCK_LISTEN)
+		while(getSn_SR(HTTP_SOCKET) != SOCK_UDP)
 		{
 			Threading::ThisThread::sleepForMs(2);
 		}
 
-		printf("Input connection\r\n");
-		if(getSn_SR(HTTP_SOCKET) != SOCK_ESTABLISHED) printf("Error socket status\r\n");
+		stat = recvfrom(HTTP_SOCKET, buffer.data(), size, ip.data(), (uint16_t*)&port);
 
-		uint8_t rIP[4];
-		getsockopt(HTTP_SOCKET, SO_DESTIP, rIP);
-		printf("IP:  %d.%d.%d.%d\r\n", rIP[0], rIP[1], rIP[2], rIP[3]);
 
-		sprintf(Message, "input connection nr - %d", reqnr);
+		stat = sendto(HTTP_SOCKET, buffer.data(), size, ip.data(), port);
 
-		send(0, (uint8_t*)Message, strlen(Message));
 
 		disconnect(HTTP_SOCKET);
 
