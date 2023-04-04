@@ -30,14 +30,19 @@ public:
 		_continueState.give();
 	}
 
-	bool addValue(uint8_t value, std::size_t size) {
-		bool result = _buffer.add(&value, size);
-		if (result && (_buffer.getSize() > _minTransferSize)) {
-			_transferSize = _minTransferSize;
-			_continueState.give();
+	bool addValue(uint8_t* value, std::size_t size) {
+		if (_startConection) {
+			bool result = _buffer.add(value, size);
+			if (result && (_buffer.getSize() >= _minTransferSize)) {
+				_transferSize = _minTransferSize;
+				_continueState.give();
+			}
+
+			return result;
 		}
 
-		return result;
+		return false;
+
 	}
 private:
 	void transferProcess() {
@@ -58,11 +63,14 @@ private:
 		result = recvfrom(_socketNumber, _buffer.data(), sizeInitialTransfer, _hostIp.data(), &_hostPort);
 
 		static constexpr uint8_t validateValue = 0xFE;
+
 		if (_buffer.get() != validateValue) {
 			disconnect(_socketNumber);
 			close(_socketNumber);
+			_startConection = false;
 			return;
 		}
+		_startConection = true;
 
 		while(true) {
 			_continueState.take();
@@ -70,6 +78,7 @@ private:
 		}
 	}
 
+	bool _startConection = false;
 	Eni::Threading::BinarySemaphore _continueState {};
 	Eni::Threading::Thread _transferProcess {};
 	const std::array<uint8_t, 4> _ip;

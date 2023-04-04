@@ -22,12 +22,6 @@ Application::Application() : _w5500Spi(hspi1, _cs) {
 uint8_t gDATABUF[DATA_BUF_SIZE];
 
 
-wiz_NetInfo gWIZNETINFO = { .mac = {0x00, 0x08, 0xdc, 0xab, 0xcd, 0xef},
-                            .ip = {192, 168, 3, 207},
-                            .sn = {255, 255, 255, 0},
-                            .gw = {192, 168, 88, 1},
-                            .dns = {0, 0, 0, 0},
-                            .dhcp = NETINFO_STATIC };
 
 uint8_t stat;
 uint8_t reqnr;
@@ -100,29 +94,11 @@ void Application::run() {
 
 	buffer.fill(10);
 
+	_transfer.start();
+
 	while(true) {
-		printf("Creating socket...\r\n");
-		stat = socket(HTTP_SOCKET, Sn_MR_UDP, 80, 0);
-		if(stat != HTTP_SOCKET) printf("socket() failed, code = %d\r\n", stat);
-		else printf("Socket created, connecting...\r\n");
-
-		while(getSn_SR(HTTP_SOCKET) != SOCK_UDP)
-		{
-			Threading::ThisThread::sleepForMs(2);
-		}
-
-		stat = recvfrom(HTTP_SOCKET, buffer.data(), size, ip.data(), (uint16_t*)&port);
-
-
-		stat = sendto(HTTP_SOCKET, buffer.data(), size, ip.data(), port);
-
-
-		disconnect(HTTP_SOCKET);
-
-		printf("Closing socket.\r\n");
-		close(HTTP_SOCKET);
-
-		Threading::ThisThread::sleepForMs(1000);
+		_transfer.addValue(buffer.data(),  size);
+		Threading::ThisThread::sleepForMs(200);
 		reqnr++;
 	}
 }
