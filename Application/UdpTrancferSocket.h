@@ -23,6 +23,8 @@ public:
 
 	void start() {
 		_continueState.give();
+		Eni::Threading::ThisThread::yield();
+		_continueState.take();
 	}
 
 	void flush() {
@@ -31,18 +33,13 @@ public:
 	}
 
 	bool addValue(uint8_t* value, std::size_t size) {
-		if (_startConection) {
-			bool result = _buffer.add(value, size);
-			if (result && (_buffer.getSize() >= _minTransferSize)) {
-				_transferSize = _minTransferSize;
-				_continueState.give();
-			}
-
-			return result;
+		bool result = _buffer.add(value, size);
+		if (result && (_buffer.getSize() >= _minTransferSize)) {
+			_transferSize = _minTransferSize;
+			_continueState.give();
 		}
 
-		return false;
-
+		return result;
 	}
 private:
 	void transferProcess() {
@@ -67,10 +64,12 @@ private:
 		if (_buffer.get() != validateValue) {
 			disconnect(_socketNumber);
 			close(_socketNumber);
-			_startConection = false;
+			_continueState.give();
 			return;
 		}
-		_startConection = true;
+
+		_continueState.give();
+		Eni::Threading::ThisThread::yield();
 
 		while(true) {
 			_continueState.take();
