@@ -1,6 +1,6 @@
-[submodule "Dependencies/ioLibrary_Driver"]
-	path = Dependencies/ioLibrary_Driver
-	url = https://github.com/Wiznet/ioLibrary_Driver.git
 [submodule "Dependencies/Eni"]
 	path = Dependencies/Eni
 	url = https://github.com/vlad230596/Eni.git
+[submodule "Dependencies/w5500"]
+	path = Dependencies/w5500
+	url = https://github.com/rschlaikjer/w5500.git
