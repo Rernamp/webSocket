@@ -97,7 +97,7 @@ void Application::run() {
 	_transfer.start();
 
 	while(true) {
-		_transfer.addValue(buffer.data(),  size);
+		_transfer.addValue(buffer.data(), size);
 		Threading::ThisThread::sleepForMs(200);
 		reqnr++;
 	}

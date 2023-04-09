@@ -28,13 +28,13 @@ public:
 	}
 
 	void flush() {
-		_transferSize = _buffer.getSize();
+		_transferSize = _buffer.getUsedSize();
 		_continueState.give();
 	}
 
 	bool addValue(uint8_t* value, std::size_t size) {
 		bool result = _buffer.add(value, size);
-		if (result && (_buffer.getSize() >= _minTransferSize)) {
+		if (result && (_buffer.getUsedSize() >= _minTransferSize)) {
 			_transferSize = _minTransferSize;
 			_continueState.give();
 		}
@@ -47,7 +47,6 @@ private:
 
 		while(!_continueState.take()){}
 
-
 		auto result = socket(_socketNumber, Sn_MR_UDP, _port, 0);
 		eniAssert(result== _socketNumber);
 
@@ -56,24 +55,31 @@ private:
 			Threading::ThisThread::sleepForMs(2);
 		}
 
-		static constexpr std::size_t sizeInitialTransfer = 1;
-		result = recvfrom(_socketNumber, _buffer.data(), sizeInitialTransfer, _hostIp.data(), &_hostPort);
+		static constexpr std::size_t sizeInitialTransfer = 2;
+		_transferSize = sizeInitialTransfer;
+		result = recvfrom(_socketNumber, _buffer.pointerForAdd(_transferSize), _transferSize, _hostIp.data(), &_hostPort);
 
 		static constexpr uint8_t validateValue = 0xFE;
-
-		if (_buffer.get() != validateValue) {
+		std::array<uint8_t, 2> resultRecive = {};
+		_buffer.get(resultRecive.data(), sizeInitialTransfer);
+		if (resultRecive[0] != validateValue) {
 			disconnect(_socketNumber);
 			close(_socketNumber);
 			_continueState.give();
 			return;
 		}
 
+		std::size_t numberTransfer = resultRecive[1];
+		std::size_t iteration = 0;
+
 		_continueState.give();
 		Eni::Threading::ThisThread::yield();
 
 		while(true) {
 			_continueState.take();
-			result = sendto(_socketNumber, _buffer.data(), _transferSize, _hostIp.data(), _hostPort);
+			result = sendto(_socketNumber, _buffer.pointerForGet(_transferSize), _transferSize, _hostIp.data(), _hostPort);
+			if (iteration == numberTransfer) return;
+			++iteration;
 		}
 	}
 
