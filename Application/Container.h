@@ -8,6 +8,13 @@ class Container {
 public:
 	Container() {
 		_buffer.fill(0);
+		reset();
+	}
+
+	void reset() {
+		_startIndex = 0;
+		_endIndex = 0;
+		_freeSize = SizeContainer;
 	}
 
 	bool add(TypeContainer* data, std::size_t size) {
@@ -110,6 +117,6 @@ private:
 	std::array<TypeContainer, SizeContainer> _buffer {};
 	std::size_t _startIndex = 0;
 	std::size_t _endIndex = 0;
-	std::size_t _freeSize = _buffer.size() - (_endIndex - _startIndex);
+	std::size_t _freeSize = SizeContainer;
 };
 

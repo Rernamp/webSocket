@@ -69,7 +69,7 @@ void Application::run() {
 	});
 
 	HAL_GPIO_WritePin(RST_GPIO_Port, RST_Pin, GPIO_PIN_RESET);
-	Threading::ThisThread::sleepForMs(1);
+	Threading::ThisThread::sleepForMs(10);
 	HAL_GPIO_WritePin(RST_GPIO_Port, RST_Pin, GPIO_PIN_SET);
 	Threading::ThisThread::sleepForMs(1000);
 
@@ -98,7 +98,8 @@ void Application::run() {
 
 	while(true) {
 		_transfer.addValue(buffer.data(), size);
-		Threading::ThisThread::sleepForMs(200);
+		Threading::ThisThread::yield();
+//		Threading::ThisThread::sleepForMs(200);
 		reqnr++;
 	}
 }

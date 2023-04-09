@@ -35,7 +35,7 @@ public:
 	bool addValue(uint8_t* value, std::size_t size) {
 		bool result = _buffer.add(value, size);
 		if (result && (_buffer.getUsedSize() >= _minTransferSize)) {
-			_transferSize = _minTransferSize;
+			_transferSize = _buffer.getUsedSize();
 			_continueState.give();
 		}
 
@@ -63,8 +63,7 @@ private:
 		std::array<uint8_t, 2> resultRecive = {};
 		_buffer.get(resultRecive.data(), sizeInitialTransfer);
 		if (resultRecive[0] != validateValue) {
-			disconnect(_socketNumber);
-			close(_socketNumber);
+			closeSession();
 			_continueState.give();
 			return;
 		}
@@ -81,6 +80,14 @@ private:
 			if (iteration == numberTransfer) return;
 			++iteration;
 		}
+
+		closeSession();
+	}
+
+	void closeSession() {
+		disconnect(_socketNumber);
+		close(_socketNumber);
+		_buffer.reset();
 	}
 
 	bool _startConection = false;
