@@ -45,6 +45,8 @@ private:
 	void transferProcess() {
 		using namespace Eni;
 
+		_buffer.reset();
+
 		while(!_continueState.take()){}
 
 		auto result = socket(_socketNumber, Sn_MR_UDP, _port, 0);
@@ -77,7 +79,7 @@ private:
 		while(true) {
 			_continueState.take();
 			result = sendto(_socketNumber, _buffer.pointerForGet(_transferSize), _transferSize, _hostIp.data(), _hostPort);
-			if (iteration == numberTransfer) return;
+			if (iteration == numberTransfer) break;
 			++iteration;
 		}
 
@@ -87,7 +89,6 @@ private:
 	void closeSession() {
 		disconnect(_socketNumber);
 		close(_socketNumber);
-		_buffer.reset();
 	}
 
 	bool _startConection = false;

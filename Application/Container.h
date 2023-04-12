@@ -24,9 +24,10 @@ public:
 			if ((_endIndex >= _startIndex) && (size > (SizeContainer - _endIndex))) {
 				std::size_t partOfDataSize = SizeContainer - _endIndex;
 				memcpy(&_buffer[_endIndex], data, partOfDataSize);
-				_endIndex = 0;
+				_endIndex += partOfDataSize;
+				_endIndex %= SizeContainer;
 				std::size_t secondPartSize = (size - partOfDataSize);
-				memcpy(&_buffer[_endIndex], (data + secondPartSize), secondPartSize);
+				memcpy(&_buffer[_endIndex], (data + partOfDataSize), secondPartSize);
 				_endIndex += secondPartSize;
 				_endIndex %= SizeContainer;
 

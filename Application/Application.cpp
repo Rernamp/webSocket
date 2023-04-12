@@ -92,7 +92,10 @@ void Application::run() {
 
 	uint32_t size = buffer.size();
 
-	buffer.fill(10);
+
+	for (std::size_t i = 0; i < buffer.size(); i++) {
+		buffer.at(i) = i;
+	}
 
 	_transfer.start();
 
