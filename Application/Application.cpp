@@ -1,4 +1,5 @@
 #include <Application.h>
+#include <AssertCallback.h>
 #include "ioLibrary_Driver/Ethernet/socket.h"
 
 #include <stdio.h>
@@ -25,6 +26,14 @@ uint8_t gDATABUF[DATA_BUF_SIZE];
 
 uint8_t stat;
 uint8_t reqnr;
+
+extern "C" void freertosAssert(int x) {
+	if (x == 0) {
+		for (;;) {
+
+		}
+	}
+}
 
 void W5500_Select(void)
 {
@@ -56,6 +65,10 @@ uint8_t W5500_ReadByte(void)
 void W5500_WriteByte(uint8_t byte)
 {
 	Application::getInstante().getSpi().writeBuff(&byte, sizeof(byte));
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+
 }
 
 
