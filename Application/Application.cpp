@@ -67,8 +67,10 @@ void W5500_WriteByte(uint8_t byte)
 	Application::getInstante().getSpi().writeBuff(&byte, sizeof(byte));
 }
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-
+extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+	if (GPIO_Pin == INT_Pin) {
+		Application::getInstante().getTransfer().interruptCallback();
+	}
 }
 
 
@@ -115,7 +117,6 @@ void Application::run() {
 	while(true) {
 		_transfer.addValue(buffer.data(), size);
 		Threading::ThisThread::yield();
-//		Threading::ThisThread::sleepForMs(200);
 		reqnr++;
 	}
 }

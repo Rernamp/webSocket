@@ -15,9 +15,15 @@ public:
 	W5500Spi& getSpi() {
 		return _w5500Spi;
 	}
+
+	UsbTrancferSocket& getTransfer() {
+		return _transfer;
+	}
 private:
 	void ledProcess();
+public:
 	Eni::GpioPin _led {LED_GPIO_Port, LED_Pin};
+private:
 	Eni::GpioPin _cs {SPI1_CS_GPIO_Port, SPI1_CS_Pin};
 	W5500Spi _w5500Spi;
 	std::array<uint8_t, 128> buffer;
