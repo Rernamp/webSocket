@@ -101,23 +101,11 @@ void Application::run() {
 	ctlnetwork(CN_SET_NETINFO, (void*) &gWIZNETINFO);
 	Threading::ThisThread::sleepForMs(1000);
 
-	std::array<uint8_t, 4> ip;
-	uint16_t port;
-
-
-	uint32_t size = buffer.size();
-
-
-	for (std::size_t i = 0; i < buffer.size(); i++) {
-		buffer.at(i) = i;
-	}
-
 	_transfer.start();
 
 	while(true) {
-		_transfer.addValue(buffer.data(), size);
+
 		Threading::ThisThread::yield();
-		reqnr++;
 	}
 }
 

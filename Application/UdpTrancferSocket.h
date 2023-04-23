@@ -28,14 +28,14 @@ public:
 	}
 
 	void flush() {
-		_transferSize = _buffer.getUsedSize();
+		_transferSize = _tranciveBuffer.getUsedSize();
 		_continueState.give();
 	}
 
 	bool addValue(uint8_t* value, std::size_t size) {
-		bool result = _buffer.add(value, size);
-		if (result && (_buffer.getUsedSize() >= _minTransferSize)) {
-			_transferSize = _buffer.getUsedSize();
+		bool result = _tranciveBuffer.add(value, size);
+		if (result && (_tranciveBuffer.getUsedSize() >= _minTransferSize)) {
+			_transferSize = _tranciveBuffer.getUsedSize();
 			_continueState.give();
 		}
 
@@ -49,7 +49,8 @@ private:
 	void transferProcess() {
 		using namespace Eni;
 
-		_buffer.reset();
+		_tranciveBuffer.reset();
+		_receiveBuffer.reset();
 
 		while(!_continueState.take()){}
 
@@ -65,12 +66,13 @@ private:
 
 		static constexpr std::size_t sizeInitialTransfer = 2;
 		_transferSize = sizeInitialTransfer;
-		_receviState.take();
-		result = recvfrom(_socketNumber, _buffer.pointerForAdd(_transferSize), _transferSize, _hostIp.data(), &_hostPort);
+		receive(_receiveBuffer.pointerForAdd(_transferSize), _transferSize);
+		_receiveBuffer.applyAdd(_transferSize);
 
 		static constexpr uint8_t validateValue = 0xFE;
 		std::array<uint8_t, 2> resultRecive = {};
-		_buffer.get(resultRecive.data(), sizeInitialTransfer);
+		_receiveBuffer.get(resultRecive.data(), sizeInitialTransfer);
+
 		if (resultRecive[0] != validateValue) {
 			closeSession();
 			_continueState.give();
@@ -82,20 +84,18 @@ private:
 
 		while(true) {
 			_continueState.take();
-			if (_receviState.take(0)) {
-				if (processInterrupt()) {
-					break;
-				}
+
+			if (receive(_receiveBuffer.pointerForAdd(_transferSize), _transferSize, 0)) {
+				_receiveBuffer.applyAdd(_transferSize);
+				break;
 			}
-			result = sendto(_socketNumber, _buffer.pointerForGet(_transferSize), _transferSize, _hostIp.data(), _hostPort);
+			result = sendto(_socketNumber, _tranciveBuffer.pointerForGet(_transferSize), _transferSize, _hostIp.data(), _hostPort);
+			_tranciveBuffer.applyGet(_transferSize);
 		}
 
 		closeSession();
 	}
 
-	bool processInterrupt() {
-		return recvfrom(_socketNumber, _buffer.pointerForAdd(_transferSize), _transferSize, _hostIp.data(), &_hostPort);
-	}
 
 	void closeSession() {
 		disconnect(_socketNumber);
@@ -105,6 +105,32 @@ private:
 	void enableInterrupt() {
 		setSn_IR(_socketNumber, Sn_IR_RECV);
 		setSIMR(1 << _socketNumber);
+	}
+
+	bool receive(uint8_t* data, std::size_t size, std::size_t timeOut = portMAX_DELAY) {
+		bool result = _receviState.take(timeOut);
+		if (result) {
+			result &= handleInterrupt();
+			if (result) {
+				result &= (recvfrom(_socketNumber, data, size, _hostIp.data(), &_hostPort) > 0);
+			}
+
+			clearInterruptFlags();
+		}
+
+		return result;
+	}
+
+	bool handleInterrupt() {
+		bool result = (1 << _socketNumber) & (getSIR());
+
+		result &= static_cast<bool>(getSn_IR(_socketNumber) & Sn_IR_RECV);
+
+		return result;
+	}
+
+	void clearInterruptFlags() {
+		setSn_IR(_socketNumber, Sn_IR_RECV);
 	}
 
 	bool _startConection = false;
@@ -119,5 +145,6 @@ private:
 
 	std::size_t _transferSize = 0;
 	static constexpr std::size_t _minTransferSize = 128;
-	Container<uint8_t, 1024> _buffer {};
+	Container<uint8_t, 1024> _tranciveBuffer {};
+	Container<uint8_t, 1024> _receiveBuffer {};
 };

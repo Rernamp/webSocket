@@ -49,10 +49,15 @@ public:
 				size = SizeContainer - _endIndex;
 			}
 			result = &_buffer[_endIndex];
-			_endIndex += size;
-			_freeSize -= size;
+//			_endIndex += size;
+//			_freeSize -= size;
 		}
 		return result;
+	}
+
+	void applyAdd(const std::size_t& size) {
+		_endIndex += size;
+		_freeSize -= size;
 	}
 
 	bool get(TypeContainer* value, std::size_t size) {
@@ -86,12 +91,18 @@ public:
 			if ((size > (SizeContainer - _startIndex))) {	// TODO chage if to ternar operator
 				size = SizeContainer - _startIndex;
 			}
-			_startIndex += size;
-			_startIndex %= SizeContainer;
-			_freeSize += size;
+//			_startIndex += size;
+//			_startIndex %= SizeContainer;
+//			_freeSize += size;
 		}
 
 		return result;
+	}
+
+	void applyGet(const std::size_t& size) {
+		_startIndex += size;
+		_startIndex %= SizeContainer;
+		_freeSize += size;
 	}
 
 	std::size_t getUsedSize() {
