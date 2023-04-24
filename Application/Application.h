@@ -34,5 +34,7 @@ private:
 	                            .gw = {192, 168, 88, 1},
 	                            .dns = {0, 0, 0, 0},
 	                            .dhcp = NETINFO_STATIC };
-	UsbTrancferSocket _transfer {{192, 168, 3, 21}, 80, 1};
+	UDA::TransmissionManager _transmittion {};
+	UsbTrancferSocket _transfer {_transmittion, {192, 168, 3, 21}, 80, 1};
+
 };

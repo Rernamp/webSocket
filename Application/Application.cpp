@@ -101,6 +101,7 @@ void Application::run() {
 	ctlnetwork(CN_SET_NETINFO, (void*) &gWIZNETINFO);
 	Threading::ThisThread::sleepForMs(1000);
 
+	_transmittion.setSender(_transfer);
 	_transfer.start();
 
 	while(true) {

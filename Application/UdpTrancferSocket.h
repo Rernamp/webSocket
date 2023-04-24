@@ -1,6 +1,8 @@
 #pragma once
 
 #include <Container.h>
+#include <TransmissionManager.h>
+
 #include "ioLibrary_Driver/Ethernet/socket.h"
 
 #include <Eni/Threading/Semaphore.h>
@@ -9,11 +11,16 @@
 
 #include <array>
 
-class UsbTrancferSocket {
+#include <Interface.h>
+
+class UsbTrancferSocket : public UDA::ISender {
 	static constexpr std::size_t StackSize = 1024;
 public:
-	UsbTrancferSocket(std::array<uint8_t, 4> ip, uint16_t port, uint8_t socketNumber) : _ip(ip), _port(port), _socketNumber(socketNumber) {
+	UsbTrancferSocket(UDA::ITransmissionManager& transmissionManager, std::array<uint8_t, 4> ip, uint16_t port, uint8_t socketNumber) :
+					_ip(ip), _port(port), _socketNumber(socketNumber), _transmissionManager(transmissionManager) {
 		_transferProcess = Eni::Threading::Thread("UdpTransfer", StackSize, Eni::Threading::ThreadPriority::Normal, [this] {
+			while(!_continueState.take()){}
+
 			while(true) {
 				transferProcess();
 			}
@@ -21,18 +28,18 @@ public:
 	}
 
 
-	void start() {
+	void start() override {
 		_continueState.give();
 		Eni::Threading::ThisThread::yield();
 		_continueState.take();
 	}
 
-	void flush() {
+	void flush() override {
 		_transferSize = _tranciveBuffer.getUsedSize();
 		_continueState.give();
 	}
 
-	bool addValue(uint8_t* value, std::size_t size) {
+	bool addValue(uint8_t* value, std::size_t size) override {
 		bool result = _tranciveBuffer.add(value, size);
 		if (result && (_tranciveBuffer.getUsedSize() >= _minTransferSize)) {
 			_transferSize = _tranciveBuffer.getUsedSize();
@@ -51,8 +58,6 @@ private:
 
 		_tranciveBuffer.reset();
 		_receiveBuffer.reset();
-
-		while(!_continueState.take()){}
 
 		auto result = socket(_socketNumber, Sn_MR_UDP, _port, 0);
 		eniAssert(result== _socketNumber);
@@ -79,6 +84,8 @@ private:
 			return;
 		}
 
+		_transmissionManager.startTransmission();
+
 		_continueState.give();
 		Eni::Threading::ThisThread::yield();
 
@@ -86,9 +93,13 @@ private:
 			_continueState.take();
 
 			if (receive(_receiveBuffer.pointerForAdd(_transferSize), _transferSize, 0)) {
+				bool exit = _transmissionManager.received(_receiveBuffer.pointerForAdd(_transferSize), _transferSize);
 				_receiveBuffer.applyAdd(_transferSize);
-				break;
+				if (exit) {
+					break;
+				}
 			}
+
 			result = sendto(_socketNumber, _tranciveBuffer.pointerForGet(_transferSize), _transferSize, _hostIp.data(), _hostPort);
 			_tranciveBuffer.applyGet(_transferSize);
 		}
@@ -142,6 +153,7 @@ private:
 	std::array<uint8_t, 4> _hostIp {};
 	uint16_t _hostPort {0};
 	const uint8_t _socketNumber;
+	UDA::ITransmissionManager& _transmissionManager;
 
 	std::size_t _transferSize = 0;
 	static constexpr std::size_t _minTransferSize = 128;
