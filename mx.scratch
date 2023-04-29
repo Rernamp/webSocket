@@ -42,6 +42,7 @@
           <stackSize>0x400</stackSize>
           <cpuclock>120</cpuclock>
           <board>custom</board>
+          <debugprobe>swd</debugprobe>
           <optimization />
           <Aincludes>
             <include />
