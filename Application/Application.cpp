@@ -12,6 +12,7 @@ Application& Application::getInstante() {
 }
 
 extern SPI_HandleTypeDef hspi1;
+extern I2S_HandleTypeDef hi2s2;
 Application::Application() : _w5500Spi(hspi1, _cs) {
 	Eni::Gpio::initOutput(_led);
 }
@@ -82,6 +83,10 @@ void Application::run() {
 	auto ledThrea = new Threading::Thread("Led", ledThreadStackSize, Threading::ThreadPriority::Normal, [this]{
 		ledProcess();
 	});
+
+	uint16_t data[4] {};
+
+	HAL_I2S_Receive_DMA(&hi2s2, data, 4);
 
 	HAL_GPIO_WritePin(RST_GPIO_Port, RST_Pin, GPIO_PIN_RESET);
 	Threading::ThisThread::sleepForMs(10);
