@@ -83,8 +83,6 @@ void Application::run() {
 		ledProcess();
 	});
 
-	uint16_t data[4] {};
-
 	HAL_GPIO_WritePin(RST_GPIO_Port, RST_Pin, GPIO_PIN_RESET);
 	Threading::ThisThread::sleepForMs(10);
 	HAL_GPIO_WritePin(RST_GPIO_Port, RST_Pin, GPIO_PIN_SET);
