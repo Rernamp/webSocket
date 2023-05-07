@@ -12,7 +12,6 @@ Application& Application::getInstante() {
 }
 
 extern SPI_HandleTypeDef hspi1;
-extern I2S_HandleTypeDef hi2s2;
 Application::Application() : _w5500Spi(hspi1, _cs) {
 	Eni::Gpio::initOutput(_led);
 }
@@ -28,13 +27,13 @@ uint8_t gDATABUF[DATA_BUF_SIZE];
 uint8_t stat;
 uint8_t reqnr;
 
-extern "C" void freertosAssert(int x) {
-	if (x == 0) {
-		for (;;) {
-
-		}
-	}
-}
+//extern "C" void freertosAssert(int x) {
+//	if (x == 0) {
+//		for (;;) {
+//
+//		}
+//	}
+//}
 
 void W5500_Select(void)
 {
@@ -85,8 +84,6 @@ void Application::run() {
 	});
 
 	uint16_t data[4] {};
-
-	HAL_I2S_Receive_DMA(&hi2s2, data, 4);
 
 	HAL_GPIO_WritePin(RST_GPIO_Port, RST_Pin, GPIO_PIN_RESET);
 	Threading::ThisThread::sleepForMs(10);
