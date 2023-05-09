@@ -12,6 +12,7 @@ Application& Application::getInstante() {
 }
 
 extern SPI_HandleTypeDef hspi1;
+extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter0;
 Application::Application() : _w5500Spi(hspi1, _cs) {
 	Eni::Gpio::initOutput(_led);
 }
@@ -73,6 +74,16 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	}
 }
 
+void HAL_DFSDM_FilterRegConvHalfCpltCallback(DFSDM_Filter_HandleTypeDef *hdfsdm_filter)
+{
+	Application::getInstante().buffer;
+}
+
+void HAL_DFSDM_FilterRegConvCpltCallback(DFSDM_Filter_HandleTypeDef *hdfsdm_filter)
+{
+	Application::getInstante().buffer;
+}
+
 
 
 void Application::run() {
@@ -103,6 +114,11 @@ void Application::run() {
 
 	_transmittion.setSender(_transfer);
 	_transfer.start();
+
+	if(HAL_DFSDM_FilterRegularMsbStart_DMA(&hdfsdm1_filter0, buffer.data(), buffer.size()) == HAL_ERROR)
+  	{
+		Error_Handler();
+  	}
 
 	while(true) {
 

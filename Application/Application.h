@@ -22,11 +22,12 @@ public:
 private:
 	void ledProcess();
 public:
+	std::array<int16_t, 256> buffer;
 	Eni::GpioPin _led {LED_GPIO_Port, LED_Pin};
 private:
 	Eni::GpioPin _cs {SPI1_CS_GPIO_Port, SPI1_CS_Pin};
 	W5500Spi _w5500Spi;
-	std::array<uint8_t, 128> buffer;
+
 
 	wiz_NetInfo gWIZNETINFO = { .mac = {0x00, 0x08, 0xdc, 0xab, 0xcd, 0xef},
 	                            .ip = {192, 168, 3, 21},
