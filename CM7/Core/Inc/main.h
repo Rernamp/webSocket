@@ -57,6 +57,10 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define STLINK_RX_Pin GPIO_PIN_8
+#define STLINK_RX_GPIO_Port GPIOD
+#define STLINK_TX_Pin GPIO_PIN_9
+#define STLINK_TX_GPIO_Port GPIOD
 #define SPI1_CS_Pin GPIO_PIN_14
 #define SPI1_CS_GPIO_Port GPIOD
 #define RST_Pin GPIO_PIN_15
