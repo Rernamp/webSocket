@@ -12,8 +12,9 @@ Application& Application::getInstante() {
 }
 
 extern SPI_HandleTypeDef hspi1;
-extern I2S_HandleTypeDef hi2s2;
-Application::Application() : _w5500Spi(hspi1, _cs) {
+extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter0;
+
+Application::Application() : _w5500Spi(hspi1, _cs), _dfsdm(hdfsdm1_filter0) {
 	Eni::Gpio::initOutput(_led);
 }
 
@@ -28,13 +29,13 @@ uint8_t gDATABUF[DATA_BUF_SIZE];
 uint8_t stat;
 uint8_t reqnr;
 
-extern "C" void freertosAssert(int x) {
-	if (x == 0) {
-		for (;;) {
-
-		}
-	}
-}
+//extern "C" void freertosAssert(int x) {
+//	if (x == 0) {
+//		for (;;) {
+//
+//		}
+//	}
+//}
 
 void W5500_Select(void)
 {
@@ -74,7 +75,20 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	}
 }
 
+void HAL_DFSDM_FilterRegConvHalfCpltCallback(DFSDM_Filter_HandleTypeDef *hdfsdm_filter)
+{
+	Application::getInstante().dataOfMicrophoneCallback(true);
+}
 
+void HAL_DFSDM_FilterRegConvCpltCallback(DFSDM_Filter_HandleTypeDef *hdfsdm_filter)
+{
+	Application::getInstante().dataOfMicrophoneCallback(false);
+}
+
+
+void Application::dataOfMicrophoneCallback(bool isHalf) {
+	_dfsdm.interruptCallback(isHalf);
+}
 
 void Application::run() {
 	using namespace Eni;
@@ -84,9 +98,7 @@ void Application::run() {
 		ledProcess();
 	});
 
-	uint16_t data[4] {};
-
-	HAL_I2S_Receive_DMA(&hi2s2, data, 4);
+	_dfsdm.setLisnter(this);
 
 	HAL_GPIO_WritePin(RST_GPIO_Port, RST_Pin, GPIO_PIN_RESET);
 	Threading::ThisThread::sleepForMs(10);
@@ -104,7 +116,7 @@ void Application::run() {
 	wizchip_setnetinfo(&gWIZNETINFO);
 
 	ctlnetwork(CN_SET_NETINFO, (void*) &gWIZNETINFO);
-	Threading::ThisThread::sleepForMs(1000);
+	Threading::ThisThread::sleepForMs(2000);
 
 	_transmittion.setSender(_transfer);
 	_transfer.start();
