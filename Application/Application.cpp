@@ -13,7 +13,8 @@ Application& Application::getInstante() {
 
 extern SPI_HandleTypeDef hspi1;
 extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter0;
-Application::Application() : _w5500Spi(hspi1, _cs) {
+
+Application::Application() : _w5500Spi(hspi1, _cs), _dfsdm(hdfsdm1_filter0) {
 	Eni::Gpio::initOutput(_led);
 }
 
@@ -76,15 +77,18 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 void HAL_DFSDM_FilterRegConvHalfCpltCallback(DFSDM_Filter_HandleTypeDef *hdfsdm_filter)
 {
-	Application::getInstante().buffer;
+	Application::getInstante().dataOfMicrophoneCallback(true);
 }
 
 void HAL_DFSDM_FilterRegConvCpltCallback(DFSDM_Filter_HandleTypeDef *hdfsdm_filter)
 {
-	Application::getInstante().buffer;
+	Application::getInstante().dataOfMicrophoneCallback(false);
 }
 
 
+void Application::dataOfMicrophoneCallback(bool isHalf) {
+	_dfsdm.interruptCallback(isHalf);
+}
 
 void Application::run() {
 	using namespace Eni;
@@ -93,6 +97,8 @@ void Application::run() {
 	auto ledThrea = new Threading::Thread("Led", ledThreadStackSize, Threading::ThreadPriority::Normal, [this]{
 		ledProcess();
 	});
+
+	_dfsdm.setLisnter(this);
 
 	HAL_GPIO_WritePin(RST_GPIO_Port, RST_Pin, GPIO_PIN_RESET);
 	Threading::ThisThread::sleepForMs(10);
@@ -110,15 +116,10 @@ void Application::run() {
 	wizchip_setnetinfo(&gWIZNETINFO);
 
 	ctlnetwork(CN_SET_NETINFO, (void*) &gWIZNETINFO);
-	Threading::ThisThread::sleepForMs(1000);
+	Threading::ThisThread::sleepForMs(2000);
 
 	_transmittion.setSender(_transfer);
 	_transfer.start();
-
-	if(HAL_DFSDM_FilterRegularMsbStart_DMA(&hdfsdm1_filter0, buffer.data(), buffer.size()) == HAL_ERROR)
-  	{
-		Error_Handler();
-  	}
 
 	while(true) {
 
