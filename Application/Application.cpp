@@ -18,25 +18,6 @@ Application::Application() : _w5500Spi(hspi1, _cs), _dfsdm(hdfsdm1_filter0) {
 	Eni::Gpio::initOutput(_led);
 }
 
-
-#define HTTP_SOCKET     0
-#define PORT_TCPS		    5000
-#define DATA_BUF_SIZE   2048
-uint8_t gDATABUF[DATA_BUF_SIZE];
-
-
-
-uint8_t stat;
-uint8_t reqnr;
-
-//extern "C" void freertosAssert(int x) {
-//	if (x == 0) {
-//		for (;;) {
-//
-//		}
-//	}
-//}
-
 void W5500_Select(void)
 {
     Application::getInstante().getSpi().select();
@@ -120,6 +101,8 @@ void Application::run() {
 
 	_transmittion.setSender(_transfer);
 	_transfer.start();
+
+	_dfsdm.start();
 
 	while(true) {
 
