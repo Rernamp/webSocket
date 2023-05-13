@@ -1,5 +1,7 @@
 #include <Application.h>
 #include <AssertCallback.h>
+#include <Math/SoundProcessing.h>
+
 #include "ioLibrary_Driver/Ethernet/socket.h"
 
 #include <stdio.h>
