@@ -64,8 +64,10 @@ private:
 
 		enableInterrupt();
 
-		while(getSn_SR(_socketNumber) != SOCK_UDP)
+		auto tempValue = getSn_SR(_socketNumber);
+		while(tempValue != SOCK_UDP)
 		{
+			tempValue = getSn_SR(_socketNumber);
 			Threading::ThisThread::sleepForMs(2);
 		}
 

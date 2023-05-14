@@ -3,7 +3,7 @@
 #include <array>
 
 namespace UDA::Driver {
-	class DFSDM {
+	class DFSDMFilter {
 		using MicDataType = int16_t;
 		static constexpr std::size_t bufferSize = 256;
 	public:
@@ -13,7 +13,7 @@ namespace UDA::Driver {
 			virtual ~IDataListener() = default;
 			virtual void dataCallback(int16_t* data, std::size_t size) = 0;
 		};
-		DFSDM(DFSDM_Filter_HandleTypeDef filterHandler) : _filterHandler(filterHandler) {
+		DFSDMFilter(DFSDM_Filter_HandleTypeDef filterHandler) : _filterHandler(filterHandler) {
 
 		}
 

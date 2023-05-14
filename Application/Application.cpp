@@ -13,11 +13,19 @@ Application& Application::getInstante() {
 	return app;
 }
 
-extern SPI_HandleTypeDef hspi1;
+extern SPI_HandleTypeDef hspi2;
 extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter0;
+extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter1;
+extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter2;
+extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter3;
 
-Application::Application() : _w5500Spi(hspi1, _cs), _dfsdm(hdfsdm1_filter0) {
+Application::Application() : _w5500Spi(hspi2, _cs), _dfsdmF0(hdfsdm1_filter0),
+		_dfsdmF1(hdfsdm1_filter1), _dfsdmF2(hdfsdm1_filter2), _dfsdmF3(hdfsdm1_filter3){
 	Eni::Gpio::initOutput(_led);
+
+	for (auto& pin : chArray) {
+		Eni::Gpio::initOutput(pin);
+	}
 }
 
 void W5500_Select(void)
@@ -61,16 +69,40 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 void HAL_DFSDM_FilterRegConvHalfCpltCallback(DFSDM_Filter_HandleTypeDef *hdfsdm_filter)
 {
 	Application::getInstante().dataOfMicrophoneCallback(true);
+	if (hdfsdm_filter == &hdfsdm1_filter0) {
+		Eni::Gpio::toggle(Application::getInstante().chArray[0]);
+	}
+	if (hdfsdm_filter == &hdfsdm1_filter1) {
+			Eni::Gpio::toggle(Application::getInstante().chArray[1]);
+	}
+	if (hdfsdm_filter == &hdfsdm1_filter2) {
+			Eni::Gpio::toggle(Application::getInstante().chArray[2]);
+	}
+	if (hdfsdm_filter == &hdfsdm1_filter3) {
+			Eni::Gpio::toggle(Application::getInstante().chArray[3]);
+	}
 }
 
 void HAL_DFSDM_FilterRegConvCpltCallback(DFSDM_Filter_HandleTypeDef *hdfsdm_filter)
 {
 	Application::getInstante().dataOfMicrophoneCallback(false);
+	if (hdfsdm_filter == &hdfsdm1_filter0) {
+		Eni::Gpio::toggle(Application::getInstante().chArray[0]);
+	}
+	if (hdfsdm_filter == &hdfsdm1_filter1) {
+			Eni::Gpio::toggle(Application::getInstante().chArray[1]);
+	}
+	if (hdfsdm_filter == &hdfsdm1_filter2) {
+			Eni::Gpio::toggle(Application::getInstante().chArray[2]);
+	}
+	if (hdfsdm_filter == &hdfsdm1_filter3) {
+			Eni::Gpio::toggle(Application::getInstante().chArray[3]);
+	}
 }
 
 
 void Application::dataOfMicrophoneCallback(bool isHalf) {
-	_dfsdm.interruptCallback(isHalf);
+//	_dfsdm.interruptCallback(isHalf);
 }
 
 void Application::run() {
@@ -81,7 +113,7 @@ void Application::run() {
 		ledProcess();
 	});
 
-	_dfsdm.setLisnter(this);
+//	_dfsdm.setLisnter(this);
 
 	HAL_GPIO_WritePin(RST_GPIO_Port, RST_Pin, GPIO_PIN_RESET);
 	Threading::ThisThread::sleepForMs(10);
@@ -102,9 +134,13 @@ void Application::run() {
 	Threading::ThisThread::sleepForMs(2000);
 
 	_transmittion.setSender(_transfer);
+
 	_transfer.start();
 
-	_dfsdm.start();
+	_dfsdmF3.start();
+	_dfsdmF2.start();
+	_dfsdmF1.start();
+	_dfsdmF0.start();
 
 	while(true) {
 

@@ -25,6 +25,12 @@
 /* USER CODE END Includes */
 extern DMA_HandleTypeDef hdma_dfsdm1_flt0;
 
+extern DMA_HandleTypeDef hdma_dfsdm1_flt1;
+
+extern DMA_HandleTypeDef hdma_dfsdm1_flt2;
+
+extern DMA_HandleTypeDef hdma_dfsdm1_flt3;
+
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
 
@@ -112,25 +118,28 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* hdfsdm_filter)
       __HAL_RCC_DFSDM1_CLK_ENABLE();
     }
 
-    __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOE_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
     /**DFSDM1 GPIO Configuration
-    PC2_C     ------> DFSDM1_CKOUT
+    PE4     ------> DFSDM1_DATIN3
+    PC0     ------> DFSDM1_DATIN4
     PE7     ------> DFSDM1_DATIN2
+    PE9     ------> DFSDM1_CKOUT
+    PE12     ------> DFSDM1_DATIN5
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_2;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF6_DFSDM1;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = GPIO_PIN_7;
+    GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_7|GPIO_PIN_9|GPIO_PIN_12;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF3_DFSDM1;
     HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GPIO_PIN_0;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Alternate = GPIO_AF6_DFSDM1;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /* USER CODE BEGIN DFSDM1_MspInit 1 */
 
@@ -160,6 +169,75 @@ void HAL_DFSDM_FilterMspInit(DFSDM_Filter_HandleTypeDef* hdfsdm_filter)
      Be aware that there is only one channel to perform all the requested DMAs. */
     __HAL_LINKDMA(hdfsdm_filter,hdmaInj,hdma_dfsdm1_flt0);
     __HAL_LINKDMA(hdfsdm_filter,hdmaReg,hdma_dfsdm1_flt0);
+  }
+
+    /* DFSDM1_FLT1 Init */
+  if(hdfsdm_filter->Instance == DFSDM1_Filter1){
+    hdma_dfsdm1_flt1.Instance = DMA1_Stream1;
+    hdma_dfsdm1_flt1.Init.Request = DMA_REQUEST_DFSDM1_FLT1;
+    hdma_dfsdm1_flt1.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_dfsdm1_flt1.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_dfsdm1_flt1.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_dfsdm1_flt1.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+    hdma_dfsdm1_flt1.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    hdma_dfsdm1_flt1.Init.Mode = DMA_CIRCULAR;
+    hdma_dfsdm1_flt1.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_dfsdm1_flt1.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_dfsdm1_flt1) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    /* Several peripheral DMA handle pointers point to the same DMA handle.
+     Be aware that there is only one channel to perform all the requested DMAs. */
+    __HAL_LINKDMA(hdfsdm_filter,hdmaInj,hdma_dfsdm1_flt1);
+    __HAL_LINKDMA(hdfsdm_filter,hdmaReg,hdma_dfsdm1_flt1);
+  }
+
+    /* DFSDM1_FLT2 Init */
+  if(hdfsdm_filter->Instance == DFSDM1_Filter2){
+    hdma_dfsdm1_flt2.Instance = DMA1_Stream2;
+    hdma_dfsdm1_flt2.Init.Request = DMA_REQUEST_DFSDM1_FLT2;
+    hdma_dfsdm1_flt2.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_dfsdm1_flt2.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_dfsdm1_flt2.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_dfsdm1_flt2.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+    hdma_dfsdm1_flt2.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    hdma_dfsdm1_flt2.Init.Mode = DMA_CIRCULAR;
+    hdma_dfsdm1_flt2.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_dfsdm1_flt2.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_dfsdm1_flt2) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    /* Several peripheral DMA handle pointers point to the same DMA handle.
+     Be aware that there is only one channel to perform all the requested DMAs. */
+    __HAL_LINKDMA(hdfsdm_filter,hdmaInj,hdma_dfsdm1_flt2);
+    __HAL_LINKDMA(hdfsdm_filter,hdmaReg,hdma_dfsdm1_flt2);
+  }
+
+    /* DFSDM1_FLT3 Init */
+  if(hdfsdm_filter->Instance == DFSDM1_Filter3){
+    hdma_dfsdm1_flt3.Instance = DMA1_Stream3;
+    hdma_dfsdm1_flt3.Init.Request = DMA_REQUEST_DFSDM1_FLT3;
+    hdma_dfsdm1_flt3.Init.Direction = DMA_PERIPH_TO_MEMORY;
+    hdma_dfsdm1_flt3.Init.PeriphInc = DMA_PINC_DISABLE;
+    hdma_dfsdm1_flt3.Init.MemInc = DMA_MINC_ENABLE;
+    hdma_dfsdm1_flt3.Init.PeriphDataAlignment = DMA_PDATAALIGN_HALFWORD;
+    hdma_dfsdm1_flt3.Init.MemDataAlignment = DMA_MDATAALIGN_HALFWORD;
+    hdma_dfsdm1_flt3.Init.Mode = DMA_CIRCULAR;
+    hdma_dfsdm1_flt3.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_dfsdm1_flt3.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
+    if (HAL_DMA_Init(&hdma_dfsdm1_flt3) != HAL_OK)
+    {
+      Error_Handler();
+    }
+
+    /* Several peripheral DMA handle pointers point to the same DMA handle.
+     Be aware that there is only one channel to perform all the requested DMAs. */
+    __HAL_LINKDMA(hdfsdm_filter,hdmaInj,hdma_dfsdm1_flt3);
+    __HAL_LINKDMA(hdfsdm_filter,hdmaReg,hdma_dfsdm1_flt3);
   }
 
 }
@@ -195,25 +273,28 @@ void HAL_DFSDM_ChannelMspInit(DFSDM_Channel_HandleTypeDef* hdfsdm_channel)
       __HAL_RCC_DFSDM1_CLK_ENABLE();
     }
 
-    __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOE_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
     /**DFSDM1 GPIO Configuration
-    PC2_C     ------> DFSDM1_CKOUT
+    PE4     ------> DFSDM1_DATIN3
+    PC0     ------> DFSDM1_DATIN4
     PE7     ------> DFSDM1_DATIN2
+    PE9     ------> DFSDM1_CKOUT
+    PE12     ------> DFSDM1_DATIN5
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_2;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF6_DFSDM1;
-    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-    GPIO_InitStruct.Pin = GPIO_PIN_7;
+    GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_7|GPIO_PIN_9|GPIO_PIN_12;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF3_DFSDM1;
     HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GPIO_PIN_0;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+    GPIO_InitStruct.Alternate = GPIO_AF6_DFSDM1;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /* USER CODE BEGIN DFSDM1_MspInit 1 */
 
@@ -241,12 +322,15 @@ void HAL_DFSDM_FilterMspDeInit(DFSDM_Filter_HandleTypeDef* hdfsdm_filter)
     __HAL_RCC_DFSDM1_CLK_DISABLE();
 
     /**DFSDM1 GPIO Configuration
-    PC2_C     ------> DFSDM1_CKOUT
+    PE4     ------> DFSDM1_DATIN3
+    PC0     ------> DFSDM1_DATIN4
     PE7     ------> DFSDM1_DATIN2
+    PE9     ------> DFSDM1_CKOUT
+    PE12     ------> DFSDM1_DATIN5
     */
-    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_2);
+    HAL_GPIO_DeInit(GPIOE, GPIO_PIN_4|GPIO_PIN_7|GPIO_PIN_9|GPIO_PIN_12);
 
-    HAL_GPIO_DeInit(GPIOE, GPIO_PIN_7);
+    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_0);
 
     /* DFSDM1 DMA DeInit */
     HAL_DMA_DeInit(hdfsdm_filter->hdmaInj);
@@ -276,12 +360,15 @@ void HAL_DFSDM_ChannelMspDeInit(DFSDM_Channel_HandleTypeDef* hdfsdm_channel)
     __HAL_RCC_DFSDM1_CLK_DISABLE();
 
     /**DFSDM1 GPIO Configuration
-    PC2_C     ------> DFSDM1_CKOUT
+    PE4     ------> DFSDM1_DATIN3
+    PC0     ------> DFSDM1_DATIN4
     PE7     ------> DFSDM1_DATIN2
+    PE9     ------> DFSDM1_CKOUT
+    PE12     ------> DFSDM1_DATIN5
     */
-    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_2);
+    HAL_GPIO_DeInit(GPIOE, GPIO_PIN_4|GPIO_PIN_7|GPIO_PIN_9|GPIO_PIN_12);
 
-    HAL_GPIO_DeInit(GPIOE, GPIO_PIN_7);
+    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_0);
 
   /* USER CODE BEGIN DFSDM1_MspDeInit 1 */
 
@@ -299,38 +386,38 @@ void HAL_DFSDM_ChannelMspDeInit(DFSDM_Channel_HandleTypeDef* hdfsdm_channel)
 void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(hspi->Instance==SPI1)
+  if(hspi->Instance==SPI2)
   {
-  /* USER CODE BEGIN SPI1_MspInit 0 */
+  /* USER CODE BEGIN SPI2_MspInit 0 */
 
-  /* USER CODE END SPI1_MspInit 0 */
+  /* USER CODE END SPI2_MspInit 0 */
     /* Peripheral clock enable */
-    __HAL_RCC_SPI1_CLK_ENABLE();
+    __HAL_RCC_SPI2_CLK_ENABLE();
 
-    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
-    /**SPI1 GPIO Configuration
-    PA5     ------> SPI1_SCK
-    PA6     ------> SPI1_MISO
-    PB5     ------> SPI1_MOSI
+    /**SPI2 GPIO Configuration
+    PC2_C     ------> SPI2_MISO
+    PC3_C     ------> SPI2_MOSI
+    PB10     ------> SPI2_SCK
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_5|GPIO_PIN_6;
+    GPIO_InitStruct.Pin = GPIO_PIN_2|GPIO_PIN_3;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+    GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_5;
+    GPIO_InitStruct.Pin = GPIO_PIN_10;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-    GPIO_InitStruct.Alternate = GPIO_AF5_SPI1;
+    GPIO_InitStruct.Alternate = GPIO_AF5_SPI2;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /* USER CODE BEGIN SPI1_MspInit 1 */
+  /* USER CODE BEGIN SPI2_MspInit 1 */
 
-  /* USER CODE END SPI1_MspInit 1 */
+  /* USER CODE END SPI2_MspInit 1 */
   }
 
 }
@@ -343,26 +430,26 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef* hspi)
 */
 void HAL_SPI_MspDeInit(SPI_HandleTypeDef* hspi)
 {
-  if(hspi->Instance==SPI1)
+  if(hspi->Instance==SPI2)
   {
-  /* USER CODE BEGIN SPI1_MspDeInit 0 */
+  /* USER CODE BEGIN SPI2_MspDeInit 0 */
 
-  /* USER CODE END SPI1_MspDeInit 0 */
+  /* USER CODE END SPI2_MspDeInit 0 */
     /* Peripheral clock disable */
-    __HAL_RCC_SPI1_CLK_DISABLE();
+    __HAL_RCC_SPI2_CLK_DISABLE();
 
-    /**SPI1 GPIO Configuration
-    PA5     ------> SPI1_SCK
-    PA6     ------> SPI1_MISO
-    PB5     ------> SPI1_MOSI
+    /**SPI2 GPIO Configuration
+    PC2_C     ------> SPI2_MISO
+    PC3_C     ------> SPI2_MOSI
+    PB10     ------> SPI2_SCK
     */
-    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_5|GPIO_PIN_6);
+    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_2|GPIO_PIN_3);
 
-    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_5);
+    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_10);
 
-  /* USER CODE BEGIN SPI1_MspDeInit 1 */
+  /* USER CODE BEGIN SPI2_MspDeInit 1 */
 
-  /* USER CODE END SPI1_MspDeInit 1 */
+  /* USER CODE END SPI2_MspDeInit 1 */
   }
 
 }

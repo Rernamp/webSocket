@@ -57,17 +57,31 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define CH3_Pin GPIO_PIN_3
+#define CH3_GPIO_Port GPIOE
+#define B1_Pin GPIO_PIN_13
+#define B1_GPIO_Port GPIOC
+#define CH1_Pin GPIO_PIN_7
+#define CH1_GPIO_Port GPIOF
+#define CH2_Pin GPIO_PIN_8
+#define CH2_GPIO_Port GPIOF
+#define CH0_Pin GPIO_PIN_9
+#define CH0_GPIO_Port GPIOF
+#define LED1_Pin GPIO_PIN_0
+#define LED1_GPIO_Port GPIOB
+#define SPI_CS_Pin GPIO_PIN_8
+#define SPI_CS_GPIO_Port GPIOE
+#define LED3_Pin GPIO_PIN_14
+#define LED3_GPIO_Port GPIOB
 #define STLINK_RX_Pin GPIO_PIN_8
 #define STLINK_RX_GPIO_Port GPIOD
 #define STLINK_TX_Pin GPIO_PIN_9
 #define STLINK_TX_GPIO_Port GPIOD
-#define SPI1_CS_Pin GPIO_PIN_14
-#define SPI1_CS_GPIO_Port GPIOD
-#define RST_Pin GPIO_PIN_15
+#define RST_Pin GPIO_PIN_12
 #define RST_GPIO_Port GPIOD
-#define INT_Pin GPIO_PIN_9
-#define INT_GPIO_Port GPIOG
-#define INT_EXTI_IRQn EXTI9_5_IRQn
+#define INT_Pin GPIO_PIN_13
+#define INT_GPIO_Port GPIOD
+#define INT_EXTI_IRQn EXTI15_10_IRQn
 #define LED_Pin GPIO_PIN_1
 #define LED_GPIO_Port GPIOE
 

@@ -7,9 +7,9 @@
 
 #include <W5500Spi.h>
 #include <UdpTrancferSocket.h>
-#include <Dfsdm.h>
+#include <DFSDM.h>
 
-class Application : public UDA::Driver::DFSDM::IDataListener {
+class Application : public UDA::Driver::DFSDMFilter::IDataListener {
 public:
 	Application();
 	static Application& getInstante();
@@ -36,10 +36,16 @@ private:
 	}
 public:
 	Eni::GpioPin _led {LED_GPIO_Port, LED_Pin};
+
+	std::array<Eni::GpioPin, 4> chArray {Eni::GpioPin{CH0_GPIO_Port, CH0_Pin}, Eni::GpioPin{CH1_GPIO_Port, CH1_Pin},
+		Eni::GpioPin{CH2_GPIO_Port, CH2_Pin}, Eni::GpioPin{CH3_GPIO_Port, CH3_Pin}};
 private:
-	Eni::GpioPin _cs {SPI1_CS_GPIO_Port, SPI1_CS_Pin};
+	Eni::GpioPin _cs {SPI_CS_GPIO_Port, SPI_CS_Pin};
 	W5500Spi _w5500Spi;
-	UDA::Driver::DFSDM _dfsdm;
+	UDA::Driver::DFSDMFilter _dfsdmF0;
+	UDA::Driver::DFSDMFilter _dfsdmF1;
+	UDA::Driver::DFSDMFilter _dfsdmF2;
+	UDA::Driver::DFSDMFilter _dfsdmF3;
 
 	wiz_NetInfo gWIZNETINFO = { .mac = {0x00, 0x08, 0xdc, 0xab, 0xcd, 0xef},
 	                            .ip = {192, 168, 3, 21},
