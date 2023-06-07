@@ -91,6 +91,8 @@ private:
 		_continueState.give();
 		Eni::Threading::ThisThread::yield();
 
+		int32_t resultTransfer = 0;
+
 		while(true) {
 			_continueState.take();
 
@@ -102,7 +104,10 @@ private:
 				}
 			}
 
-			result = sendto(_socketNumber, _tranciveBuffer.pointerForGet(_transferSize), _transferSize, _hostIp.data(), _hostPort);
+			resultTransfer = sendto(_socketNumber, _tranciveBuffer.pointerForGet(_transferSize), _transferSize, _hostIp.data(), _hostPort);
+			if (resultTransfer != _transferSize) {
+				continue;
+			}
 			_tranciveBuffer.applyGet(_transferSize);
 		}
 

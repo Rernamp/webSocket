@@ -14,7 +14,10 @@ namespace UDA::Driver {
 			virtual void dataCallback(int16_t* data, std::size_t size) = 0;
 		};
 		DFSDMFilter(DFSDM_Filter_HandleTypeDef filterHandler) : _filterHandler(filterHandler) {
-
+//			for (std::size_t i = 0; i < _tempData.size(); i++) {
+//				_tempData[i] = i;
+//			}
+			_tempData.fill(128);
 		}
 
 		void start() {
@@ -28,8 +31,8 @@ namespace UDA::Driver {
 		}
 
 		void interruptCallback(bool isHalf) {
-			int16_t* data = _bufferOfData.data();
-			std::size_t size = _bufferOfData.size() / 2;
+			int16_t* data = _tempData.data();
+			std::size_t size = _tempData.size() / 2;
 			if (!isHalf) {
 				data += size;
 			}
@@ -41,6 +44,7 @@ namespace UDA::Driver {
 
 	private:
 		std::array<MicDataType, bufferSize> _bufferOfData {};
+		std::array<MicDataType, bufferSize> _tempData {};
 		DFSDM_Filter_HandleTypeDef _filterHandler;
 		IDataListener* _listener = nullptr;
 	};
