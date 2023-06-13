@@ -105,6 +105,24 @@ void Application::dataOfMicrophoneCallback(bool isHalf) {
 	_dfsdmF0.interruptCallback(isHalf);
 }
 
+void Application::W5500ChipInit()  {
+
+	HAL_GPIO_WritePin(RST_GPIO_Port, RST_Pin, GPIO_PIN_RESET);
+	Eni::Threading::ThisThread::sleepForMs(500);
+	HAL_GPIO_WritePin(RST_GPIO_Port, RST_Pin, GPIO_PIN_SET);
+	Eni::Threading::ThisThread::sleepForMs(500);
+
+	reg_wizchip_cs_cbfunc(W5500_Select, W5500_Unselect);
+	reg_wizchip_spi_cbfunc(W5500_ReadByte, W5500_WriteByte);
+	reg_wizchip_spiburst_cbfunc(W5500_ReadBuff, W5500_WriteBuff);
+
+
+	uint8_t rx_tx_buff_sizes[] = {2, 2, 2, 2, 2, 2, 2, 2};
+
+	wizchip_init(rx_tx_buff_sizes, rx_tx_buff_sizes);
+
+}
+
 void Application::run() {
 	using namespace Eni;
 
@@ -115,22 +133,12 @@ void Application::run() {
 
 	_dfsdmF0.setLisnter(this);
 
-	HAL_GPIO_WritePin(RST_GPIO_Port, RST_Pin, GPIO_PIN_RESET);
-	Threading::ThisThread::sleepForMs(10);
-	HAL_GPIO_WritePin(RST_GPIO_Port, RST_Pin, GPIO_PIN_SET);
-	Threading::ThisThread::sleepForMs(1000);
-
-	reg_wizchip_cs_cbfunc(W5500_Select, W5500_Unselect);
-	reg_wizchip_spi_cbfunc(W5500_ReadByte, W5500_WriteByte);
-	reg_wizchip_spiburst_cbfunc(W5500_ReadBuff, W5500_WriteBuff);
-
-	uint8_t rx_tx_buff_sizes[] = {2, 2, 2, 2, 2, 2, 2, 2};
-
-	wizchip_init(rx_tx_buff_sizes, rx_tx_buff_sizes);
+	W5500ChipInit();
 
 	wizchip_setnetinfo(&gWIZNETINFO);
 
 	ctlnetwork(CN_SET_NETINFO, (void*) &gWIZNETINFO);
+
 	Threading::ThisThread::sleepForMs(2000);
 
 	_transmittion.setSender(_transfer);

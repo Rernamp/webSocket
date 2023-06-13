@@ -59,17 +59,35 @@ private:
 		_tranciveBuffer.reset();
 		_receiveBuffer.reset();
 
-		auto result = socket(_socketNumber, Sn_MR_UDP, _port, 0);
-		eniAssert(result== _socketNumber);
+		auto result = socket(_socketNumber, Sn_MR_TCP, _port, SF_TCP_NODELAY);
+		eniAssert(result == _socketNumber);
+
+		while(getSn_SR(_socketNumber) != SOCK_INIT) {
+			Threading::ThisThread::sleepForMs(2);
+		}
+
+		while(listen(_socketNumber) != SOCK_OK) {
+			Threading::ThisThread::sleepForMs(2);
+		}
 
 		enableInterrupt();
 
-		auto tempValue = getSn_SR(_socketNumber);
-		while(tempValue != SOCK_UDP)
+		while(getSn_SR(_socketNumber) == SOCK_LISTEN)
 		{
-			tempValue = getSn_SR(_socketNumber);
 			Threading::ThisThread::sleepForMs(2);
 		}
+
+
+
+		while(getSn_SR(_socketNumber) == SOCK_ESTABLISHED)
+		{
+			Threading::ThisThread::sleepForMs(2);
+		}
+
+
+
+		getsockopt(_socketNumber, SO_DESTIP, _hostIp.data());
+		getsockopt(_socketNumber, SO_DESTPORT, (uint8_t*)&_hostPort);
 
 		static constexpr std::size_t sizeInitialTransfer = 2;
 		_transferSize = sizeInitialTransfer;
@@ -104,7 +122,7 @@ private:
 				}
 			}
 
-			resultTransfer = sendto(_socketNumber, _tranciveBuffer.pointerForGet(_transferSize), _transferSize, _hostIp.data(), _hostPort);
+			resultTransfer = send(_socketNumber, _tranciveBuffer.pointerForGet(_transferSize), _transferSize);
 			if (resultTransfer != _transferSize) {
 				continue;
 			}
@@ -130,7 +148,7 @@ private:
 		if (result) {
 			result &= handleInterrupt();
 			if (result) {
-				result &= (recvfrom(_socketNumber, data, size, _hostIp.data(), &_hostPort) > 0);
+				result &= (recv(_socketNumber, data, size) > 0);
 			}
 
 			clearInterruptFlags();

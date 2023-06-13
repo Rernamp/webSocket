@@ -34,6 +34,8 @@ private:
 
 		_transfer.addValue(reinterpret_cast<uint8_t*>(data), size * 2);
 	}
+
+	void W5500ChipInit();
 public:
 	Eni::GpioPin _led {LED_GPIO_Port, LED_Pin};
 
