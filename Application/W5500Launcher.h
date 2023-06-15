@@ -48,7 +48,9 @@ namespace UDA {
 		}
 	private:
 		bool closeSocket() {
-			#warning "implement this"
+			
+
+			close(_socketNumber);
 		}
 
 		bool openSocket() {
@@ -62,17 +64,30 @@ namespace UDA {
 					Threading::ThisThread::sleepForMs(10);
 				}
 
-				result &= listen(_socketNumber) == SOCK_OK;
+				result &= listen(_socketNumber) == SOCK_OK;				
 			}
 
-		}
-		W5500::Transmitter _transmitter {};
-		W5500::Receiver _receiver {};
+			if (result) {
+				while(getSn_SR(CLIENT_SOCKET) == SOCK_LISTEN) {
+					Threading::ThisThread::sleepForMs(10);
+				}
 
+				result &= (getSn_SR(CLIENT_SOCKET) == SOCK_ESTABLISHED);
+			}
+
+
+			return result;
+
+		}
+		
 		Eni::Threading::Thread _transmitProcess {};
 		Eni::Threading::Thread _receiveProcess {};
 
 		uint8_t _socketNumber;
+
+		W5500::Transmitter _transmitter {_socketNumber};
+		W5500::Receiver _receiver {_socketNumber};
+
 
 		std::array<uint8_t, 4> _hostIp {}; 
 		uint16_t _hostPort {}; 

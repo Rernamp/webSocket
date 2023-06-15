@@ -2,7 +2,6 @@
 
 #include <Fifo.h>
 
-#include <W5500Connection.h>
 
 namespace UDA::W5500 {
 	class ITransmitter {
@@ -17,55 +16,59 @@ namespace UDA::W5500 {
 
 			return _data.pushData(data, size);
 		}
-
-		void setConnection(IConnection* connection) {
-			_connection = connection;
-		}
-
 	private:
-		IConnection* _connection = nullptr;
 		Fifo<1024> _data {};
 	}
 	class Transmitter : public ITransmitter {
 	public:
+		Transmitter(uint8_t socketNumber) : _socketNumber(socketNumber) {
+
+		}
 		#error "Add in transmitter and reciver socket number"
 		void process() {
 			
 
 			while(true) {
-				// if (_data.size() > 0) {
-					while((_data.size() / maxBufferSize) != 0) {
-						if (!sendData(_data.pop(txData.data(), maxBufferSize), maxBufferSize)) {
-							emitStopEvent();
-							break;
-						}	
-					}
+				while((_data.size() / maxBufferSize) != 0) {
+					if (!sendData(_data.pop(txData.data(), maxBufferSize), maxBufferSize)) {
+						break;
+					}	
+				}
 
-					if ((_data.size() % maxBufferSize)) {
-						std::size_t lastData = _data.size() % maxBufferSize;					
-						if (!sendData(_data.pop(txData.data(), lastData), lastData)) {
-							emitStopEvent();
-							break;
-						}	
-					}
-				// }
+				if ((_data.size() % maxBufferSize)) {
+					std::size_t lastData = _data.size() % maxBufferSize;					
+					if (!sendData(_data.pop(txData.data(), lastData), lastData)) {
+						break;
+					}	
+				}
+
+				Thread::ThisThread::yeild();
+				#warning "May be change yeild to semaphore"
 			}
 		}
 	private:
 		bool sendData(uint8_t* data, std::size_t size) {
-			#warning "Implement send data to W5500"
-			#warning "add return false for generate stop enent"
-			return 0;
-		}
+			auto sizeSends = send(_socketNumber, data, size);
 
-		void emitStopEvent() {
-			if (_connection) {
-				_connection->stopEvent();
+			if (sizeSends < 0) {
+				return false;
 			}
+
+			while(size > 0) {
+				size -= sizeSends;
+				data += sizeSends;
+				sizeSends = send(_socketNumber, data, size);
+				if (sizeSends < 0) {
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 		static constexpr std::size_t maxBufferSize = 128;
 		std::array<uint8_t, maxBufferSize> txData {};
+		uint8_t _socketNumber;
 	};
 
 }

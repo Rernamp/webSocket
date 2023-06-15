@@ -16,6 +16,10 @@ namespace UDA::W5500 {
 			virtual bool receive(uint8_t* data, std::size_t size) = 0;
 		};
 	public:
+
+		Receiver(uint8_t socketNumber) : _socketNumber(socketNumber) {
+
+		}
 		
 		void setHandler(IReceiverHandler* handler) {
 			_receiverHandler = handler;
@@ -61,6 +65,7 @@ namespace UDA::W5500 {
 
 		static constexpr std::size_t maxBufferSize = 128;
 		std::array<uint8_t, 128> _data {};
+		uint8_t _socketNumber;
 	};
 
 }
