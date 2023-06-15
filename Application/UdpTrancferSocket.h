@@ -79,9 +79,10 @@ private:
 
 
 
-		while(getSn_SR(_socketNumber) == SOCK_ESTABLISHED)
+		if (getSn_SR(_socketNumber) != SOCK_ESTABLISHED)
 		{
-			Threading::ThisThread::sleepForMs(2);
+			close(_socketNumber);
+			return;
 		}
 
 

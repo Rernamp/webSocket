@@ -13,7 +13,7 @@
 namespace UDA {
 	class W5500Launcher {
 	public:
-		W5500Launcher(std::array<uint8_t, 4> ip, uint16_t port, uint8_t socketNumber) : _ip(ip), _port(port), _socketNumber(socketNumber) {
+		W5500Launcher(uint8_t socketNumber) : _socketNumber(socketNumber) {
 		}
 
 		void init() {
@@ -21,9 +21,10 @@ namespace UDA {
 
 			_transmitProcess = Eni::Threading::Thread("Transmitt", StackSize, Eni::Threading::ThreadPriority::Normal, [this] {
 				while(true) {
-					openSocket();
 
-					_transmitter.process();
+					if (openSocket()) {
+						_transmitter.process();
+					}
 
 					closeSocket();
 				}
@@ -46,12 +47,24 @@ namespace UDA {
 			return _receiver;
 		}
 	private:
-		void closeSocket() {
+		bool closeSocket() {
 			#warning "implement this"
 		}
 
-		void openSocket() {
-			#warning "implement this"
+		bool openSocket() {
+			using namespace Eni;
+
+			auto socketNumber = socket(_socketNumber, Sn_MR_TCP, _port, SF_TCP_NODELAY);
+			bool result = (socketNumber == _socketNumber);				
+
+			if (result) {
+				while(getSn_SR(CLIENT_SOCKET) != SOCK_INIT) {
+					Threading::ThisThread::sleepForMs(10);
+				}
+
+				result &= listen(_socketNumber) == SOCK_OK;
+			}
+
 		}
 		W5500::Transmitter _transmitter {};
 		W5500::Receiver _receiver {};
@@ -59,8 +72,6 @@ namespace UDA {
 		Eni::Threading::Thread _transmitProcess {};
 		Eni::Threading::Thread _receiveProcess {};
 
-		std::array<uint8_t, 4> _ip; 
-		uint16_t _port; 
 		uint8_t _socketNumber;
 
 		std::array<uint8_t, 4> _hostIp {}; 
