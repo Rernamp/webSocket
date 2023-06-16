@@ -140,7 +140,7 @@ private:
 	}
 
 	void enableInterrupt() {
-		setSn_IR(_socketNumber, Sn_IR_RECV);
+		setSn_IMR(_socketNumber, Sn_IR_RECV);
 		setSIMR(1 << _socketNumber);
 	}
 

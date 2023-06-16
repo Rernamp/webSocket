@@ -68,6 +68,7 @@ namespace UDA {
 			}
 
 			if (result) {
+				enableInterrupt();
 				while(getSn_SR(CLIENT_SOCKET) == SOCK_LISTEN) {
 					Threading::ThisThread::sleepForMs(10);
 				}
@@ -78,6 +79,11 @@ namespace UDA {
 
 			return result;
 
+		}
+
+		void enableInterrupt() {
+			setSn_IMR(_socketNumber, Sn_IMR_RECV);
+			setSIMR(1 << _socketNumber);
 		}
 		
 		Eni::Threading::Thread _transmitProcess {};

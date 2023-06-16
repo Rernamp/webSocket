@@ -25,6 +25,10 @@ namespace UDA::W5500 {
 			_receiverHandler = handler;
 		}
 
+		void handleInterrupt() {
+			_dataReceived.give();
+		}
+
 		void process() {
 			while (true) {
 				while(!_dataReceived.take()) {}
