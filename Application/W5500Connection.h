@@ -1,11 +1,14 @@
 #pragma once
 
-namespace UDA::W5500 {
+#include <W5500Transmitter.h>
+
+namespace UDA {
 
     class IConnection {
     public:
-        virtual ~IConnection() = default;
-        virtual void stopEvent() = 0;
+        virtual ~IConnection() = default;        
+        virtual void process(ITransmitter* transmiter) = 0;        
+        virtual void stop() = 0;        
     };
 
     class Connection {

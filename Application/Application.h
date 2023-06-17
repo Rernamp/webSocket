@@ -6,8 +6,9 @@
 #include <Eni/Gpio/Gpio.h>
 
 #include <W5500Spi.h>
-#include <UdpTrancferSocket.h>
+#include <W5500Launcher.h>
 #include <DFSDM.h>
+#include <ConnectionsManager.h>
 
 class Application : public UDA::Driver::DFSDMFilter::IDataListener {
 public:
@@ -19,9 +20,11 @@ public:
 		return _w5500Spi;
 	}
 
-	UsbTrancferSocket& getTransfer() {
-		return _transfer;
+
+	UDA::W5500Launcher& getLauncher() {
+		return _launcher;
 	}
+
 private:
 	void ledProcess();
 	void dataCallback(int16_t* data, std::size_t size) override {
@@ -32,8 +35,9 @@ private:
 			data++;
 		}
 
-		_transfer.addValue(reinterpret_cast<uint8_t*>(data), size * 2);
+		_launcher.getTransmitter().append(reinterpret_cast<uint8_t*>(data), size * 2);
 	}
+
 
 	void W5500ChipInit();
 public:
@@ -55,7 +59,11 @@ private:
 	                            .gw = {192, 168, 88, 1},
 	                            .dns = {0, 0, 0, 0},
 	                            .dhcp = NETINFO_STATIC };
-	UDA::TransmissionManager _transmittion {};
-	UsbTrancferSocket _transfer {_transmittion, {192, 168, 3, 21}, 80, 1};
 
+	static constexpr uint8_t _port = 80;
+	static constexpr uint8_t _socketNumber = 2;
+
+	UDA::W5500Launcher _launcher {_port, _socketNumber};
+
+	UDA::ConnectionsManager _conManager {&_launcher.getTransmitter()};
 };

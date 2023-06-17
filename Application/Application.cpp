@@ -62,7 +62,7 @@ void W5500_WriteByte(uint8_t byte)
 
 extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (GPIO_Pin == INT_Pin) {
-		Application::getInstante().getTransfer().interruptCallback();
+		Application::getInstante().getLauncher().getReceiver().handleInterrupt();
 	}
 }
 
@@ -141,14 +141,14 @@ void Application::run() {
 
 	Threading::ThisThread::sleepForMs(2000);
 
-	_transmittion.setSender(_transfer);
+	_launcher.getReceiver().setHandler(&_conManager);
 
-	_transfer.start();
+	_launcher.init();
 
-	_dfsdmF3.start();
-	_dfsdmF2.start();
-	_dfsdmF1.start();
-	_dfsdmF0.start();
+	// _dfsdmF3.start();
+	// _dfsdmF2.start();
+	// _dfsdmF1.start();
+	// _dfsdmF0.start();
 
 	while(true) {
 
