@@ -2,6 +2,7 @@
 
 #include <Dfsdm.h>
 #include <FilterContainer.h>
+#include <StaticVector.h>
 
 #include <Eni/Threading/Semaphore.h>
 
@@ -13,11 +14,25 @@ namespace UDA {
     public:
         struct DataContainer {
             int16_t * data;
-            std::size_t size;
+            std::size_t size;            
         };
+
+        struct MapDataContainerToFilter {
+            DataContainer container;
+            uint8_t numberFilter;
+        };
+
         void dataCallback(int16_t* data, std::size_t size, uint8_t numberFilter) {
         	if (!exitRequest) {
-                _elementsDataContainer[numberFilter] = DataContainer{data, size};
+                {
+                    for (auto& elementdataContainer : _elementsDataContainer) {
+                        if (elementdataContainer.numberFilter == numberFilter) {
+                            elementdataContainer.container = DataContainer{data, size};
+                            break;
+                        }
+                    }
+                }
+                                
                 _elementsComplete.set(numberFilter);
 
                 if (_elementsComplete == _elementsConfiguration) {
@@ -39,14 +54,8 @@ namespace UDA {
             startFilters();
 
             int32_t tempData = 0;
-            std::size_t numberElements = 0;
+            int32_t numberElements = _filters.size();
             int16_t data = 0;
-            for (std::size_t element = 0; element < _filters.size(); element++) {
-                if (_filters[element]) {
-                    ++numberElements;
-                }
-            }
-
             while((!exitRequest)) {
                 if (!_startProcess.take()) {
                     continue;
@@ -54,19 +63,17 @@ namespace UDA {
                 
                 for (std::size_t i = 0; i < 128; i++) { //TODO fix hardcode
                 
-                    for (std::size_t element = 0; element < _filters.size(); element++) {
-                        if (_filters[element]) {
-                            tempData += *_elementsDataContainer[element].data;
-                            ++_elementsDataContainer[element].data;
-                        }
+                    for (auto& element : _elementsDataContainer) {                        
+                        tempData += *element.container.data;
+                        ++element.container.data;
                     }
+                        
                     tempData /= numberElements;
                     data = static_cast<int16_t>(tempData);
                     _transmitter->append(reinterpret_cast<uint8_t*>(&data), sizeof(int16_t));
-                    tempData = 0;
+                    tempData = 0;                    
                 }
             }
-
             stopFilters();
         }
 
@@ -84,34 +91,32 @@ namespace UDA {
 
     private:
         void startFilters() {
-            for (std::size_t i = _filters.size(); i > 0; --i) {
-                if (_filters[i - 1]) {
-                	_filters[i - 1]->setLisnter(this);
-                	_filters[i - 1]->start();
-                }
+            for (UDA::Driver::DFSDMFilter* filter : _filters) {
+            	filter->setLisnter(this);
+            	filter->start();
             }
         }
         void stopFilters() {
             for (UDA::Driver::DFSDMFilter* filter : _filters) {
-                if (filter) {
-                    filter->stop();
-                    filter->setLisnter(nullptr);
-                }
+                filter->stop();
+                filter->setLisnter(nullptr);
             }
 
-            _filters.fill(nullptr);
+            _elementsDataContainer.clear();
+            _filters.clear();
         }
 
         void fillFilters() {
-            for (std::size_t i = 0; i < _elementsConfiguration.size(); i++) {
+            for (int8_t i = _elementsConfiguration.size() - 1; i >= 0; i--) {
                 if (_elementsConfiguration.test(i)) {
-                    _filters[i] = &getFilterByIndex(i);
+                    _filters.push_back(&getFilterByIndex(i));
+					_elementsDataContainer.push_back(MapDataContainerToFilter{DataContainer{}, i});
                 }
             }
         }
         static constexpr std::size_t maxNumberElements = 4;
-        std::array<UDA::Driver::DFSDMFilter*, maxNumberElements> _filters {nullptr};        
-        std::array<DataContainer, maxNumberElements> _elementsDataContainer {};
+        StaticVector<UDA::Driver::DFSDMFilter*, maxNumberElements> _filters {};
+        StaticVector<MapDataContainerToFilter, maxNumberElements> _elementsDataContainer {};
         std::bitset<maxNumberElements> _elementsConfiguration {0};
         std::bitset<maxNumberElements> _elementsComplete {0};
 
