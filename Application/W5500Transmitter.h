@@ -64,6 +64,7 @@ namespace UDA {
 			auto sizeSends = send(_socketNumber, data, size);
 
 			if (sizeSends < 0) {
+				auto value1 = getSn_MR(_socketNumber);
 				return false;
 			}
 			size -= sizeSends;

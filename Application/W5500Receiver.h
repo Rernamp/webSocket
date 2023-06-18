@@ -45,6 +45,7 @@ namespace UDA {
 
 	private:		
 		void handleReceive() {
+			auto value = getSn_MR(_socketNumber);
 			bool result = (1 << _socketNumber) & (getSIR());
 
 			if (result) {
@@ -58,9 +59,14 @@ namespace UDA {
 		}
 
 		void receive() {
-			int32_t succesLenght = 0;
-			while(succesLenght = recv(_socketNumber, _data.data(), _data.size()), ((succesLenght > 0) && _receiverHandler)) {
-				_receiverHandler->receive(_data.data(), succesLenght);
+			int32_t succesLenght = getSn_RX_RSR(_socketNumber);
+
+			while((succesLenght > 0)) {
+				succesLenght = recv(_socketNumber, _data.data(), _data.size());
+				if (_receiverHandler) {
+					_receiverHandler->receive(_data.data(), succesLenght);
+				}
+				succesLenght = getSn_RX_RSR(_socketNumber);
 			}
 		}
 

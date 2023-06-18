@@ -4,6 +4,8 @@
 
 #include "ioLibrary_Driver/Ethernet/socket.h"
 
+#include <Eni/Debug/Assert.h>
+
 #include <stdio.h>
 #include <string.h>
 
@@ -138,6 +140,12 @@ void Application::run() {
 	wizchip_setnetinfo(&gWIZNETINFO);
 
 	ctlnetwork(CN_SET_NETINFO, (void*) &gWIZNETINFO);
+
+	{
+		wiz_NetInfo temp = {};
+		ctlnetwork(CN_GET_NETINFO,(void *)&temp);
+		eniAssert(memcmp(&temp,&gWIZNETINFO,sizeof(wiz_NetInfo)) == 0);
+	}
 
 	Threading::ThisThread::sleepForMs(2000);
 
