@@ -9,6 +9,7 @@
 
 
 #include <TestConnection.h>
+#include <MicrophoneArray.h>
 
 namespace UDA {
     class ConnectionsManager : public Receiver::IReceiverHandler {
@@ -31,7 +32,10 @@ namespace UDA {
                     _actualConnection = &_test;
                     _startConnectionProcess.give();
                     break;
-                
+                case 1:
+                    _actualConnection = &_mic;
+                    _startConnectionProcess.give();
+                    break;
                 default:
                     break;
                 }
@@ -64,5 +68,6 @@ namespace UDA {
         IConnection* _actualConnection = nullptr;
 
         TestConnection _test {};
+        MicrophoneArray _mic {};
     };
 }

@@ -10,7 +10,7 @@
 #include <DFSDM.h>
 #include <ConnectionsManager.h>
 
-class Application : public UDA::Driver::DFSDMFilter::IDataListener {
+class Application {
 public:
 	Application();
 	static Application& getInstante();
@@ -25,19 +25,12 @@ public:
 		return _launcher;
 	}
 
-private:
-	void ledProcess();
-	void dataCallback(int16_t* data, std::size_t size) override {
-		int16_t& value = *data;
-		for (std::size_t i = 0; i < size; i++) {
-			value = *data;
-			value = (value >> 8) | ((value & 0xFF) << 8);
-			data++;
-		}
-
-		_launcher.getTransmitter().append(reinterpret_cast<uint8_t*>(data), size * 2);
+	UDA::Driver::DFSDMFilter& getFilter() {
+		return _dfsdmF0;
 	}
 
+private:
+	void ledProcess();
 
 	void W5500ChipInit();
 public:

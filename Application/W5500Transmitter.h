@@ -28,6 +28,7 @@ namespace UDA {
 		}
 
 		void process() {
+			bool exitRequest = false;
 			_data.clear();
 
 			{
@@ -42,8 +43,13 @@ namespace UDA {
 				while((_data.size() / maxBufferSize) != 0) {
 					_data.pop(txData.data(), maxBufferSize);
 					if (!sendData(txData.data(), maxBufferSize)) {
+						exitRequest = true;
 						break;
 					}	
+				}
+
+				if (exitRequest) {
+					break;
 				}
 
 				if ((_data.size() % maxBufferSize)) {

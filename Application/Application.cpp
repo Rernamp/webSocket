@@ -133,7 +133,6 @@ void Application::run() {
 		ledProcess();
 	});
 
-	_dfsdmF0.setLisnter(this);
 
 	W5500ChipInit();
 

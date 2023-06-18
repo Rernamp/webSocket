@@ -27,11 +27,8 @@ namespace UDA {
             }
         }
 
-        void stop() override {
-            exitRequest = true;
-        }
     private:
-        bool exitRequest = false;
+        
         static constexpr std::size_t sizeTestData = 256;
         std::array<uint8_t, sizeTestData> _data = {};
         ITransmitter* _transmitter = nullptr;

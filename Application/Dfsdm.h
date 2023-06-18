@@ -1,6 +1,10 @@
 #pragma once
 
 #include <array>
+#include <cstdint>
+#include "stm32h7xx_hal.h"
+#include <Eni/Debug/Assert.h>
+
 
 namespace UDA::Driver {
 	class DFSDMFilter {
@@ -14,15 +18,17 @@ namespace UDA::Driver {
 			virtual void dataCallback(int16_t* data, std::size_t size) = 0;
 		};
 		DFSDMFilter(DFSDM_Filter_HandleTypeDef filterHandler) : _filterHandler(filterHandler) {
-//			for (std::size_t i = 0; i < _tempData.size(); i++) {
-//				_tempData[i] = i;
-//			}
-			_tempData.fill(128);
 		}
 
 		void start() {
 			if(HAL_DFSDM_FilterRegularMsbStart_DMA(&_filterHandler, _bufferOfData.data(), _bufferOfData.size()) == HAL_ERROR) {
-				Error_Handler();
+				eniAssert(false);
+			}
+		}
+
+		void stop() {
+			if(HAL_DFSDM_FilterRegularStop_DMA(&_filterHandler) == HAL_ERROR) {
+				eniAssert(false);
 			}
 		}
 
@@ -31,8 +37,8 @@ namespace UDA::Driver {
 		}
 
 		void interruptCallback(bool isHalf) {
-			int16_t* data = _tempData.data();
-			std::size_t size = _tempData.size() / 2;
+			int16_t* data = _bufferOfData.data();
+			std::size_t size = _bufferOfData.size() / 2;
 			if (!isHalf) {
 				data += size;
 			}
@@ -44,7 +50,6 @@ namespace UDA::Driver {
 
 	private:
 		std::array<MicDataType, bufferSize> _bufferOfData {};
-		std::array<MicDataType, bufferSize> _tempData {};
 		DFSDM_Filter_HandleTypeDef _filterHandler;
 		IDataListener* _listener = nullptr;
 	};

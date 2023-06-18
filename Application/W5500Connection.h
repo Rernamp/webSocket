@@ -8,7 +8,11 @@ namespace UDA {
     public:
         virtual ~IConnection() = default;        
         virtual void process(ITransmitter* transmiter) = 0;        
-        virtual void stop() = 0;        
+        virtual void stop() {
+            exitRequest = true;
+        };
+    protected:
+        bool exitRequest = false;
     };
 
     class Connection {
