@@ -3,8 +3,6 @@
 #include <Dfsdm.h>
 
 namespace UDA {
-	Driver::DFSDMFilter& getFilter1();
-    Driver::DFSDMFilter& getFilter2();
-    Driver::DFSDMFilter& getFilter3();
-    Driver::DFSDMFilter& getFilter4();
+    Driver::DFSDMFilter& getFilterByIndex(std::size_t index);
+
 }

@@ -7,17 +7,23 @@ namespace UDA {
     class IConnection {
     public:
         virtual ~IConnection() = default;        
-        virtual void process(ITransmitter* transmiter) = 0;        
-        virtual void stop() {
-            exitRequest = true;
-        };
-        virtual bool receive(uint8_t* data, std::size_t size) {};
-    protected:
-        bool exitRequest = false;
+        virtual void process(ITransmitter* transmiter) = 0;
+        virtual bool receive(uint8_t* data, std::size_t size) {return false;};
+        virtual void stop() = 0;
     };
 
-    class Connection {
+    class BaseConnection : public IConnection {
     public:
-    private:
+    	void stop() override {
+			exitRequest = true;
+		};
+    	void process(ITransmitter* transmiter) override {
+    		_transmitter = transmiter;
+            process();
+    	}
+    	virtual void process() = 0;
+    protected:
+    	bool exitRequest = false;
+    	ITransmitter* _transmitter = nullptr;
     };
 } 

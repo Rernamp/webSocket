@@ -3,16 +3,7 @@
 #include <Application.h>
 
 namespace UDA {
-    Driver::DFSDMFilter& getFilter1() {
-        return Application::getInstante().getFilter();
-    }
-    Driver::DFSDMFilter& getFilter2() {
-        return Application::getInstante().getFilter();
-    }
-    Driver::DFSDMFilter& getFilter3() {
-        return Application::getInstante().getFilter();
-    }
-    Driver::DFSDMFilter& getFilter4() {
-        return Application::getInstante().getFilter();
+    Driver::DFSDMFilter& getFilterByIndex(std::size_t index) {
+        return Application::getInstante().getFilterByIndex(index);
     }
 }

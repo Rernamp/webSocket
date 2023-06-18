@@ -21,8 +21,10 @@ extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter1;
 extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter2;
 extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter3;
 
-Application::Application() : _w5500Spi(hspi1, _cs), _dfsdmF0(hdfsdm1_filter0, 0),
-		_dfsdmF1(hdfsdm1_filter1, 1), _dfsdmF2(hdfsdm1_filter2, 2), _dfsdmF3(hdfsdm1_filter3, 3){
+Application::Application() : _w5500Spi(hspi1, _cs), _dfsdmFilters({UDA::Driver::DFSDMFilter{&hdfsdm1_filter0, 0},
+	UDA::Driver::DFSDMFilter{&hdfsdm1_filter1, 1},
+	UDA::Driver::DFSDMFilter{&hdfsdm1_filter2, 2},
+	UDA::Driver::DFSDMFilter{&hdfsdm1_filter3, 3}}) {
 	Eni::Gpio::initOutput(_led);
 
 	for (auto& pin : chArray) {
@@ -70,7 +72,7 @@ extern "C" void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 void HAL_DFSDM_FilterRegConvHalfCpltCallback(DFSDM_Filter_HandleTypeDef *hdfsdm_filter)
 {
-	Application::getInstante().dataOfMicrophoneCallback(true);
+	Application::getInstante().dataOfMicrophoneCallback(hdfsdm_filter, true);
 	if (hdfsdm_filter == &hdfsdm1_filter0) {
 		Eni::Gpio::toggle(Application::getInstante().chArray[0]);
 	}
@@ -85,9 +87,9 @@ void HAL_DFSDM_FilterRegConvHalfCpltCallback(DFSDM_Filter_HandleTypeDef *hdfsdm_
 	}
 }
 
-void HAL_DFSDM_FilterRegConvCpltCallback(DFSDM_Filter_HandleTypeDef *hdfsdm_filter)
+void HAL_DFSDM_FilterRegConvCpltCallback(DFSDM_Filter_HandleTypeDef * hdfsdm_filter)
 {
-	Application::getInstante().dataOfMicrophoneCallback(false);
+	Application::getInstante().dataOfMicrophoneCallback(hdfsdm_filter, false);
 	if (hdfsdm_filter == &hdfsdm1_filter0) {
 		Eni::Gpio::toggle(Application::getInstante().chArray[0]);
 	}
@@ -103,8 +105,13 @@ void HAL_DFSDM_FilterRegConvCpltCallback(DFSDM_Filter_HandleTypeDef *hdfsdm_filt
 }
 
 
-void Application::dataOfMicrophoneCallback(bool isHalf) {
-	_dfsdmF0.interruptCallback(isHalf);
+void Application::dataOfMicrophoneCallback(DFSDM_Filter_HandleTypeDef * filter, bool isHalf) {
+	for (auto& filterElement : _dfsdmFilters) {
+		if (filterElement.equal(filter)) {
+			filterElement.interruptCallback(isHalf);
+			break;
+		}
+	}	
 }
 
 void Application::W5500ChipInit()  {

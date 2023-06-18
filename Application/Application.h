@@ -15,7 +15,7 @@ public:
 	Application();
 	static Application& getInstante();
 	void run();
-	void dataOfMicrophoneCallback(bool isHalf);
+	void dataOfMicrophoneCallback(DFSDM_Filter_HandleTypeDef * hdfsdm_filter, bool isHalf);
 	W5500Spi& getSpi() {
 		return _w5500Spi;
 	}
@@ -24,9 +24,8 @@ public:
 	UDA::W5500Launcher& getLauncher() {
 		return _launcher;
 	}
-
-	UDA::Driver::DFSDMFilter& getFilter() {
-		return _dfsdmF0;
+	UDA::Driver::DFSDMFilter& getFilterByIndex(std::size_t index) {
+		return _dfsdmFilters[index];
 	}
 
 private:
@@ -41,11 +40,9 @@ public:
 private:
 	Eni::GpioPin _cs {SPI_CS_GPIO_Port, SPI_CS_Pin};
 	W5500Spi _w5500Spi;
-	UDA::Driver::DFSDMFilter _dfsdmF0;
-	UDA::Driver::DFSDMFilter _dfsdmF1;
-	UDA::Driver::DFSDMFilter _dfsdmF2;
-	UDA::Driver::DFSDMFilter _dfsdmF3;
-
+	static constexpr std::size_t numberElements = 4;
+	std::array<UDA::Driver::DFSDMFilter, numberElements> _dfsdmFilters;
+	
 	wiz_NetInfo gWIZNETINFO = { .mac = {0x00, 0x08, 0xdc, 0xab, 0xcd, 0xef},
 	                            .ip = {192, 168, 3, 21},
 	                            .sn = {255, 255, 255, 0},

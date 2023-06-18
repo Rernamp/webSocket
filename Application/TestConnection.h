@@ -8,7 +8,7 @@
 #include <array>
 
 namespace UDA {
-    class TestConnection : public IConnection {
+    class TestConnection : public BaseConnection {
     public:
         TestConnection() {            
         	for (std::size_t i = 0; i < _data.size(); i++) {
@@ -16,8 +16,7 @@ namespace UDA {
         	}
         }
 
-        void process(ITransmitter* transmitter) override {
-            _transmitter = transmitter;
+        void process() override {
             exitRequest = false;
             while(!exitRequest) {
                 using namespace Eni;
@@ -28,9 +27,7 @@ namespace UDA {
         }
 
     private:
-        
         static constexpr std::size_t sizeTestData = 256;
         std::array<uint8_t, sizeTestData> _data = {};
-        ITransmitter* _transmitter = nullptr;
     };
 }

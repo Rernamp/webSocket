@@ -17,17 +17,17 @@ namespace UDA::Driver {
 			virtual ~IDataListener() = default;
 			virtual void dataCallback(int16_t* data, std::size_t size, uint8_t numberFilter) = 0;
 		};
-		DFSDMFilter(DFSDM_Filter_HandleTypeDef filterHandler, uint8_t number) : _filterHandler(filterHandler), numberFilter(number) {
+		DFSDMFilter(DFSDM_Filter_HandleTypeDef* filterHandler, uint8_t number) : _filterHandler(filterHandler), numberFilter(number) {
 		}
 
 		void start() {
-			if(HAL_DFSDM_FilterRegularMsbStart_DMA(&_filterHandler, _bufferOfData.data(), _bufferOfData.size()) == HAL_ERROR) {
+			if(HAL_DFSDM_FilterRegularMsbStart_DMA(_filterHandler, _bufferOfData.data(), _bufferOfData.size()) == HAL_ERROR) {
 				eniAssert(false);
 			}
 		}
 
 		void stop() {
-			if(HAL_DFSDM_FilterRegularStop_DMA(&_filterHandler) == HAL_ERROR) {
+			if(HAL_DFSDM_FilterRegularStop_DMA(_filterHandler) == HAL_ERROR) {
 				eniAssert(false);
 			}
 		}
@@ -48,12 +48,16 @@ namespace UDA::Driver {
 			}
 		}
 
+		inline bool equal(DFSDM_Filter_HandleTypeDef* filter) {
+			return filter == _filterHandler;
+		}
+
 		const uint8_t numberFilter;
 
 	private:
 		std::array<MicDataType, bufferSize> _bufferOfData {};
 		
-		DFSDM_Filter_HandleTypeDef _filterHandler;
+		DFSDM_Filter_HandleTypeDef* _filterHandler;
 		IDataListener* _listener = nullptr;
 	};
 
