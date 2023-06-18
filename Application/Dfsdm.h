@@ -15,9 +15,9 @@ namespace UDA::Driver {
 		class IDataListener {
 		public:
 			virtual ~IDataListener() = default;
-			virtual void dataCallback(int16_t* data, std::size_t size) = 0;
+			virtual void dataCallback(int16_t* data, std::size_t size, uint8_t numberFilter) = 0;
 		};
-		DFSDMFilter(DFSDM_Filter_HandleTypeDef filterHandler) : _filterHandler(filterHandler) {
+		DFSDMFilter(DFSDM_Filter_HandleTypeDef filterHandler, uint8_t number) : _filterHandler(filterHandler), numberFilter(number) {
 		}
 
 		void start() {
@@ -44,12 +44,15 @@ namespace UDA::Driver {
 			}
 
 			if (_listener) {
-				_listener->dataCallback(data, size);
+				_listener->dataCallback(data, size, numberFilter);
 			}
 		}
 
+		const uint8_t numberFilter;
+
 	private:
 		std::array<MicDataType, bufferSize> _bufferOfData {};
+		
 		DFSDM_Filter_HandleTypeDef _filterHandler;
 		IDataListener* _listener = nullptr;
 	};

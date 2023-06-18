@@ -21,8 +21,8 @@ extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter1;
 extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter2;
 extern DFSDM_Filter_HandleTypeDef hdfsdm1_filter3;
 
-Application::Application() : _w5500Spi(hspi1, _cs), _dfsdmF0(hdfsdm1_filter0),
-		_dfsdmF1(hdfsdm1_filter1), _dfsdmF2(hdfsdm1_filter2), _dfsdmF3(hdfsdm1_filter3){
+Application::Application() : _w5500Spi(hspi1, _cs), _dfsdmF0(hdfsdm1_filter0, 0),
+		_dfsdmF1(hdfsdm1_filter1, 1), _dfsdmF2(hdfsdm1_filter2, 2), _dfsdmF3(hdfsdm1_filter3, 3){
 	Eni::Gpio::initOutput(_led);
 
 	for (auto& pin : chArray) {

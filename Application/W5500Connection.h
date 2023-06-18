@@ -11,6 +11,7 @@ namespace UDA {
         virtual void stop() {
             exitRequest = true;
         };
+        virtual bool receive(uint8_t* data, std::size_t size) {};
     protected:
         bool exitRequest = false;
     };
