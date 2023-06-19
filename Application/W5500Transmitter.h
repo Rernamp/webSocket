@@ -63,6 +63,8 @@ namespace UDA {
 				Eni::Threading::ThisThread::yield();
 				#warning "May be change yeild to semaphore"
 			}
+
+			_data.clear();
 		}
 	private:
 		bool sendData(uint8_t* data, std::size_t size) {

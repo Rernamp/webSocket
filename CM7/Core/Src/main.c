@@ -345,7 +345,7 @@ static void MX_DFSDM1_Init(void)
   hdfsdm1_channel2.Instance = DFSDM1_Channel2;
   hdfsdm1_channel2.Init.OutputClock.Activation = ENABLE;
   hdfsdm1_channel2.Init.OutputClock.Selection = DFSDM_CHANNEL_OUTPUT_CLOCK_AUDIO;
-  hdfsdm1_channel2.Init.OutputClock.Divider = 150;
+  hdfsdm1_channel2.Init.OutputClock.Divider = 75;
   hdfsdm1_channel2.Init.Input.Multiplexer = DFSDM_CHANNEL_EXTERNAL_INPUTS;
   hdfsdm1_channel2.Init.Input.DataPacking = DFSDM_CHANNEL_STANDARD_MODE;
   hdfsdm1_channel2.Init.Input.Pins = DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS;
@@ -362,7 +362,7 @@ static void MX_DFSDM1_Init(void)
   hdfsdm1_channel3.Instance = DFSDM1_Channel3;
   hdfsdm1_channel3.Init.OutputClock.Activation = ENABLE;
   hdfsdm1_channel3.Init.OutputClock.Selection = DFSDM_CHANNEL_OUTPUT_CLOCK_AUDIO;
-  hdfsdm1_channel3.Init.OutputClock.Divider = 150;
+  hdfsdm1_channel3.Init.OutputClock.Divider = 75;
   hdfsdm1_channel3.Init.Input.Multiplexer = DFSDM_CHANNEL_EXTERNAL_INPUTS;
   hdfsdm1_channel3.Init.Input.DataPacking = DFSDM_CHANNEL_STANDARD_MODE;
   hdfsdm1_channel3.Init.Input.Pins = DFSDM_CHANNEL_SAME_CHANNEL_PINS;
@@ -379,7 +379,7 @@ static void MX_DFSDM1_Init(void)
   hdfsdm1_channel4.Instance = DFSDM1_Channel4;
   hdfsdm1_channel4.Init.OutputClock.Activation = ENABLE;
   hdfsdm1_channel4.Init.OutputClock.Selection = DFSDM_CHANNEL_OUTPUT_CLOCK_AUDIO;
-  hdfsdm1_channel4.Init.OutputClock.Divider = 150;
+  hdfsdm1_channel4.Init.OutputClock.Divider = 75;
   hdfsdm1_channel4.Init.Input.Multiplexer = DFSDM_CHANNEL_EXTERNAL_INPUTS;
   hdfsdm1_channel4.Init.Input.DataPacking = DFSDM_CHANNEL_STANDARD_MODE;
   hdfsdm1_channel4.Init.Input.Pins = DFSDM_CHANNEL_FOLLOWING_CHANNEL_PINS;
@@ -396,7 +396,7 @@ static void MX_DFSDM1_Init(void)
   hdfsdm1_channel5.Instance = DFSDM1_Channel5;
   hdfsdm1_channel5.Init.OutputClock.Activation = ENABLE;
   hdfsdm1_channel5.Init.OutputClock.Selection = DFSDM_CHANNEL_OUTPUT_CLOCK_AUDIO;
-  hdfsdm1_channel5.Init.OutputClock.Divider = 150;
+  hdfsdm1_channel5.Init.OutputClock.Divider = 75;
   hdfsdm1_channel5.Init.Input.Multiplexer = DFSDM_CHANNEL_EXTERNAL_INPUTS;
   hdfsdm1_channel5.Init.Input.DataPacking = DFSDM_CHANNEL_STANDARD_MODE;
   hdfsdm1_channel5.Init.Input.Pins = DFSDM_CHANNEL_SAME_CHANNEL_PINS;
