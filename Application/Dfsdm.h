@@ -26,6 +26,10 @@ namespace UDA::Driver {
 			}
 		}
 
+		std::size_t sizeOfHalfTransfere() {
+			return bufferSize / 2;
+		}
+
 		void stop() {
 			if(HAL_DFSDM_FilterRegularStop_DMA(_filterHandler) == HAL_ERROR) {
 				eniAssert(false);

@@ -46,7 +46,7 @@ namespace UDA {
                 }
                 size -= 2;
             }
-            if (size > 0) {
+            if ((size > 0) && result) {
                 _actualConnection->receive(&data[2], size);
             }
             return result;    

@@ -18,7 +18,7 @@ namespace UDA {
 			return _data.push(data, size);
 		}
 	protected:
-		Fifo<1024> _data {};
+		Fifo<2048> _data {};
 	};
 
 	class Transmitter : public ITransmitter {

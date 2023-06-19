@@ -126,7 +126,7 @@ void Application::W5500ChipInit()  {
 	reg_wizchip_spiburst_cbfunc(W5500_ReadBuff, W5500_WriteBuff);
 
 
-	uint8_t rx_tx_buff_sizes[] = {2, 2, 2, 2, 2, 2, 2, 2};
+	uint8_t rx_tx_buff_sizes[] = {16, 0, 0, 0, 0, 0, 0, 0};
 
 	wizchip_init(rx_tx_buff_sizes, rx_tx_buff_sizes);
 

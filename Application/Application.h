@@ -51,7 +51,7 @@ private:
 	                            .dhcp = NETINFO_STATIC };
 
 	static constexpr uint8_t _port = 80;
-	static constexpr uint8_t _socketNumber = 2;
+	static constexpr uint8_t _socketNumber = 0;
 
 	UDA::W5500Launcher _launcher {_port, _socketNumber};
 
