@@ -73,7 +73,7 @@ namespace UDA {
 
 			enableInterrupt();
 
-			auto value = getSn_MR(_socketNumber);
+			
 
 			return result;
 		}

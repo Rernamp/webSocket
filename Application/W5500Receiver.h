@@ -45,7 +45,7 @@ namespace UDA {
 
 	private:		
 		void handleReceive() {
-			auto value = getSn_MR(_socketNumber);
+			
 			bool result = (1 << _socketNumber) & (getSIR());
 
 			if (result) {

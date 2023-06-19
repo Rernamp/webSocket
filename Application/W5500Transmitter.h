@@ -66,7 +66,7 @@ namespace UDA {
 		}
 	private:
 		bool sendData(uint8_t* data, std::size_t size) {
-			auto value = getSn_MR(_socketNumber);
+			
 			auto sizeSends = send(_socketNumber, data, size);
 
 			if (sizeSends < 0) {
@@ -87,7 +87,7 @@ namespace UDA {
 			return true;
 		}
 
-		static constexpr std::size_t maxBufferSize = 128;
+		static constexpr std::size_t maxBufferSize = 256;
 		std::array<uint8_t, maxBufferSize> txData {};
 		uint8_t _socketNumber;
 	};
