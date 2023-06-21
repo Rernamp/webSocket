@@ -7,6 +7,7 @@
 
 #include <W5500Connection.h>
 #include <Math/SoundProcessing.h>
+#include <Math/LC_NLMS.h>
 
 #include <Eni/Threading/Semaphore.h>
 
@@ -131,6 +132,7 @@ namespace UDA {
 
         AverageProcess _average {};
         StreamAllSignal _streamAllSignal {};
+        LC_NLMS __adaptiveAlgoritm {};
 
         Eni::Threading::BinarySemaphore _startProcess {};
     };

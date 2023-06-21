@@ -4,3 +4,6 @@
 [submodule "Dependencies/Eni"]
 	path = Dependencies/Eni
 	url = https://github.com/Rernamp/Eni.git
+[submodule "Application/Math"]
+	path = Application/Math
+	url = https://github.com/Rernamp/Math.git
