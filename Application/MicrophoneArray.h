@@ -72,7 +72,7 @@ namespace UDA {
 
         bool receive(uint8_t* data, std::size_t size) override {
             static constexpr std::size_t dataSize = 2;
-            bool result = size == dataSize;
+            bool result = size >= dataSize;
 
             _elementsConfiguration = data[0];
 
@@ -83,13 +83,18 @@ namespace UDA {
             case 1 :
                 _signalProcessing = &_streamAllSignal;
                 break;
+            case 2 :
+                _signalProcessing = &_adaptiveAlgoritm;
+                break;
             default :
                 _signalProcessing = nullptr;
                 break;
             }
             
-            #warning "Added this choose of algoritm"
-            // data[1];
+            if ((data[1] == 2) && result) {
+                filterOrders = data[2];
+            }
+            
             return result;
         }
     private:
@@ -118,6 +123,9 @@ namespace UDA {
                     _processSize += _filters.back()->sizeOfHalfTransfere();
                 }
             }
+            if (_signalProcessing == &_adaptiveAlgoritm) {
+                _adaptiveAlgoritm.initFilter(_filters.size(), filterOrders);
+            }
             _processSize /= _filters.size();
         }
         static constexpr std::size_t maxNumberElements = 4;
@@ -132,7 +140,8 @@ namespace UDA {
 
         AverageProcess _average {};
         StreamAllSignal _streamAllSignal {};
-        LC_NLMS __adaptiveAlgoritm {};
+        LC_NLMS _adaptiveAlgoritm {};
+        uint8_t filterOrders = 32;
 
         Eni::Threading::BinarySemaphore _startProcess {};
     };
