@@ -44,7 +44,7 @@ private:
 	std::array<UDA::Driver::DFSDMFilter, numberElements> _dfsdmFilters;
 	
 	wiz_NetInfo gWIZNETINFO = { .mac = {0x00, 0x08, 0xdc, 0xab, 0xcd, 0xef},
-	                            .ip = {192, 168, 3, 21},
+	                            .ip = {192, 168, 3, 27},
 	                            .sn = {255, 255, 255, 0},
 	                            .gw = {192, 168, 88, 1},
 	                            .dns = {0, 0, 0, 0},

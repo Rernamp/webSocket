@@ -34,12 +34,15 @@ namespace UDA {
             exitRequest = false;
             _filter->setLisnter(this);
             _filter->start();
+            getFilterByIndex(0).start();
+
             while(!exitRequest) {
                 using namespace Eni;
                 
                 Threading::ThisThread::sleepForMs(10);
             }
 
+            getFilterByIndex(0).stop();
             _filter->stop();
             _filter->setLisnter(nullptr);
         }
